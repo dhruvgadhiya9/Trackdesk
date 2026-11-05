@@ -1,3 +1,5 @@
+'use client';
+
 import type { DragEvent, ReactNode } from 'react';
 import { cn } from '../lib/cn';
 
