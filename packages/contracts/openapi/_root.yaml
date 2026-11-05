@@ -1,0 +1,24 @@
+# TrackDesk API — root document.
+# Module files (one per module) are merged into ../generated/openapi.bundled.yaml by
+# scripts/bundle-openapi.mjs. Edit the module files, then run `pnpm contracts:generate`.
+openapi: 3.1.0
+info:
+  title: TrackDesk API
+  version: 0.1.0
+  description: |
+    Multi-tenant field service management API (UK). Every operation is tenant-scoped by the
+    caller's JWT (`app_metadata.tenant_id`). `x-roles` lists the roles allowed and
+    `x-permission` the permission constant from permissions.yaml.
+servers:
+  - url: http://localhost:8080
+    description: local
+security:
+  - bearerAuth: []
+paths: {}
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Supabase Auth access token.

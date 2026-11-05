@@ -1,0 +1,55 @@
+# Customer portal module — SCAFFOLD (Sprint 5). PRD: docs/prd/16-customer-portal.md
+tags:
+  - name: Portal
+    description: Customer portal (customer role only sees own records).
+paths:
+  /v1/portal/summary:
+    get:
+      tags: [Portal]
+      operationId: getPortalSummary
+      x-roles: [customer]
+      x-permission: portal:access
+      x-status: scaffold
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/PortalSummary' } } } }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+  /v1/portal/job-requests:
+    post:
+      tags: [Portal]
+      operationId: createJobRequest
+      x-roles: [customer]
+      x-permission: portal:request-job
+      x-status: scaffold
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/CreateJobRequestRequest' } } }
+      responses:
+        '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/JobRequest' } } } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+components:
+  schemas:
+    PortalSummary:
+      type: object
+      required: [siteCount, assetCount, upcomingMaintenance, recentJobs]
+      properties:
+        siteCount: { type: integer, format: int32 }
+        assetCount: { type: integer, format: int32 }
+        upcomingMaintenance: { type: array, items: { $ref: '#/components/schemas/MaintenanceSchedule' } }
+        recentJobs: { type: array, items: { $ref: '#/components/schemas/Job' } }
+    JobRequest:
+      type: object
+      required: [id, siteId, description, status]
+      properties:
+        id: { type: string, format: uuid }
+        siteId: { type: string, format: uuid }
+        description: { type: string }
+        preferredDate: { type: string, format: date }
+        status: { type: string, enum: [new, accepted, declined, converted] }
+    CreateJobRequestRequest:
+      type: object
+      required: [siteId, description]
+      properties:
+        siteId: { type: string, format: uuid }
+        description: { type: string, minLength: 5, maxLength: 4000 }
+        preferredDate: { type: string, format: date }

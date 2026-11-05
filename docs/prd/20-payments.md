@@ -1,5 +1,5 @@
 # PRD 20 — Payments
-Linked Figma frame: TODO · Contract: `packages/contracts/openapi/payments.yaml` · Sprint 6
+Linked Figma frame: TODO · Contract: `packages/contracts/openapi/billing.yaml` · Sprint 6
 **SECURITY-REVIEW-REQUIRED · payment flow sign-off is human-only**
 
 ## Design

@@ -1,5 +1,5 @@
 # PRD 22 — Chat
-Linked Figma frame: TODO · Contract: `packages/contracts/openapi/chat.yaml` · Sprint 6
+Linked Figma frame: TODO · Contract: `packages/contracts/openapi/reporting-chat.yaml` · Sprint 6
 
 ## User stories
 - As an ops manager, I chat with a technician about a job, and with a customer about their request.

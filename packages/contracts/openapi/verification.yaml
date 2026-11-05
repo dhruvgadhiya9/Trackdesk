@@ -1,0 +1,46 @@
+# Verification module (Happy Code OTP) — SCAFFOLD (Sprint 5). PRD: docs/prd/15-happy-code.md
+# SECURITY-REVIEW-REQUIRED: OTP hashing, attempt limits, rate limits.
+tags:
+  - name: Verification
+    description: Happy Code job verification.
+paths:
+  /v1/jobs/{jobId}/happy-code:
+    post:
+      tags: [Verification]
+      operationId: sendHappyCode
+      summary: (Re)send the Happy Code to the site contact.
+      x-roles: [company_owner, ops_manager, field_worker]
+      x-permission: verification:verify
+      x-status: scaffold
+      parameters:
+        - { name: jobId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '202': { description: Sent }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { description: Too many resends, content: { application/problem+json: { schema: { $ref: '#/components/schemas/Problem' } } } }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+  /v1/jobs/{jobId}/happy-code/verify:
+    post:
+      tags: [Verification]
+      operationId: verifyHappyCode
+      x-roles: [field_worker, company_owner, ops_manager]
+      x-permission: verification:verify
+      x-status: scaffold
+      parameters:
+        - { name: jobId, in: path, required: true, schema: { type: string, format: uuid } }
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/VerifyHappyCodeRequest' } } }
+      responses:
+        '200': { description: Verified, content: { application/json: { schema: { $ref: '#/components/schemas/Job' } } } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '410': { description: Expired or locked, content: { application/problem+json: { schema: { $ref: '#/components/schemas/Problem' } } } }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+components:
+  schemas:
+    VerifyHappyCodeRequest:
+      type: object
+      required: [code]
+      properties:
+        code: { type: string, pattern: '^\d{6}$' }

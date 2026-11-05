@@ -1,0 +1,82 @@
+# Dispatch module — SCAFFOLD (Sprint 3). PRDs: 09-scheduling, 10-dispatch-board
+tags:
+  - name: Dispatch
+    description: Dispatch board, technician availability and assignment.
+paths:
+  /v1/dispatch/board:
+    get:
+      tags: [Dispatch]
+      operationId: getDispatchBoard
+      x-roles: [company_owner, ops_manager]
+      x-permission: dispatch:read
+      x-status: scaffold
+      parameters:
+        - { name: date, in: query, required: true, schema: { type: string, format: date } }
+        - { name: teamId, in: query, required: false, schema: { type: string, format: uuid } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/DispatchBoard' } } } }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+  /v1/dispatch/jobs/{jobId}/suggestions:
+    get:
+      tags: [Dispatch]
+      operationId: suggestTechnicians
+      x-roles: [company_owner, ops_manager]
+      x-permission: dispatch:read
+      x-status: scaffold
+      parameters:
+        - { name: jobId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/TechnicianSuggestion' } } } } }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+  /v1/dispatch/jobs/{jobId}/assignment:
+    put:
+      tags: [Dispatch]
+      operationId: assignJob
+      x-roles: [company_owner, ops_manager]
+      x-permission: dispatch:assign
+      x-status: scaffold
+      parameters:
+        - { name: jobId, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/AssignJobRequest' } } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Job' } } } }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+components:
+  schemas:
+    Technician:
+      type: object
+      required: [id, fullName, skills]
+      properties:
+        id: { type: string, format: uuid }
+        fullName: { type: string }
+        skills: { type: array, items: { type: string } }
+        teamIds: { type: array, items: { type: string, format: uuid } }
+        lastLocation: { $ref: '#/components/schemas/GeoPoint' }
+        lastLocationAt: { type: string, format: date-time }
+    DispatchBoard:
+      type: object
+      required: [date, technicians, jobs, unassigned]
+      properties:
+        date: { type: string, format: date }
+        technicians: { type: array, items: { $ref: '#/components/schemas/Technician' } }
+        jobs: { type: array, items: { $ref: '#/components/schemas/Job' } }
+        unassigned: { type: array, items: { $ref: '#/components/schemas/Job' } }
+    TechnicianSuggestion:
+      type: object
+      required: [technician, score]
+      properties:
+        technician: { $ref: '#/components/schemas/Technician' }
+        score: { type: number, format: double }
+        distanceMeters: { type: number, format: double }
+        reasons: { type: array, items: { type: string } }
+    AssignJobRequest:
+      type: object
+      required: [technicianId, scheduledStart, scheduledEnd, version]
+      properties:
+        technicianId: { type: string, format: uuid }
+        scheduledStart: { type: string, format: date-time }
+        scheduledEnd: { type: string, format: date-time }
+        version: { type: integer, format: int64 }

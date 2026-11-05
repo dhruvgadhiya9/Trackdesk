@@ -1,0 +1,148 @@
+# Customers module — REFERENCE MODULE. PRD: docs/prd/01-customers.md
+tags:
+  - name: Customers
+    description: Organisations the contractor services.
+paths:
+  /v1/customers:
+    get:
+      tags: [Customers]
+      operationId: listCustomers
+      x-roles: [company_owner, ops_manager, field_worker, customer]
+      x-permission: customers:read
+      parameters:
+        - $ref: '#/components/parameters/Search'
+        - name: status
+          in: query
+          required: false
+          schema: { $ref: '#/components/schemas/CustomerStatus' }
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CustomerPage' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    post:
+      tags: [Customers]
+      operationId: createCustomer
+      x-roles: [company_owner, ops_manager]
+      x-permission: customers:create
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateCustomerRequest' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Customer' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /v1/customers/{customerId}:
+    parameters:
+      - { name: customerId, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      tags: [Customers]
+      operationId: getCustomer
+      x-roles: [company_owner, ops_manager, field_worker, customer]
+      x-permission: customers:read
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Customer' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    put:
+      tags: [Customers]
+      operationId: updateCustomer
+      x-roles: [company_owner, ops_manager]
+      x-permission: customers:update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateCustomerRequest' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Customer' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /v1/customers/{customerId}/archive:
+    parameters:
+      - { name: customerId, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      tags: [Customers]
+      operationId: archiveCustomer
+      x-roles: [company_owner, ops_manager]
+      x-permission: customers:archive
+      responses:
+        '200':
+          description: Archived
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Customer' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+components:
+  schemas:
+    CustomerStatus:
+      type: string
+      enum: [active, archived]
+    Customer:
+      type: object
+      required: [id, name, status, version, createdAt, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        accountNumber: { type: string }
+        email: { type: string }
+        phone: { type: string }
+        billingAddress: { $ref: '#/components/schemas/Address' }
+        notes: { type: string }
+        status: { $ref: '#/components/schemas/CustomerStatus' }
+        version: { type: integer, format: int64 }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    CustomerPage:
+      type: object
+      required: [items, page]
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/Customer' }
+        page: { $ref: '#/components/schemas/PageMeta' }
+    CreateCustomerRequest:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 200, pattern: '.*\S.*' }
+        accountNumber: { type: string, maxLength: 50 }
+        email: { type: string, format: email, maxLength: 254 }
+        phone: { type: string, maxLength: 30 }
+        billingAddress: { $ref: '#/components/schemas/Address' }
+        notes: { type: string, maxLength: 2000 }
+    UpdateCustomerRequest:
+      type: object
+      required: [name, version]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 200, pattern: '.*\S.*' }
+        accountNumber: { type: string, maxLength: 50 }
+        email: { type: string, format: email, maxLength: 254 }
+        phone: { type: string, maxLength: 30 }
+        billingAddress: { $ref: '#/components/schemas/Address' }
+        notes: { type: string, maxLength: 2000 }
+        version: { type: integer, format: int64, description: Optimistic lock version from the last read. }

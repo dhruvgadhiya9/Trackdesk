@@ -1,0 +1,99 @@
+# Reporting and chat — SCAFFOLD (Sprint 6). PRDs: 21-reporting, 22-chat
+tags:
+  - name: Reporting
+    description: Tenant-scoped operational reports.
+  - name: Chat
+    description: Chat history and moderation (live delivery via Supabase Realtime).
+paths:
+  /v1/reports/summary:
+    get:
+      tags: [Reporting]
+      operationId: getReportSummary
+      x-roles: [company_owner, ops_manager]
+      x-permission: reporting:read
+      x-status: scaffold
+      parameters:
+        - { name: from, in: query, required: true, schema: { type: string, format: date } }
+        - { name: to, in: query, required: true, schema: { type: string, format: date } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/ReportSummary' } } } }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+  /v1/chat/conversations:
+    get:
+      tags: [Chat]
+      operationId: listConversations
+      x-roles: [company_owner, ops_manager, field_worker, customer]
+      x-permission: chat:read
+      x-status: scaffold
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Conversation' } } } } }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+  /v1/chat/conversations/{conversationId}/messages:
+    get:
+      tags: [Chat]
+      operationId: listMessages
+      x-roles: [company_owner, ops_manager, field_worker, customer]
+      x-permission: chat:read
+      x-status: scaffold
+      parameters:
+        - { name: conversationId, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: before, in: query, required: false, schema: { type: string, format: date-time } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/ChatMessage' } } } } }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+    post:
+      tags: [Chat]
+      operationId: sendMessage
+      x-roles: [company_owner, ops_manager, field_worker, customer]
+      x-permission: chat:write
+      x-status: scaffold
+      parameters:
+        - { name: conversationId, in: path, required: true, schema: { type: string, format: uuid } }
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/SendMessageRequest' } } }
+      responses:
+        '201': { description: Sent, content: { application/json: { schema: { $ref: '#/components/schemas/ChatMessage' } } } }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+components:
+  schemas:
+    ReportSummary:
+      type: object
+      required: [from, to, jobsCompleted, slaCompliancePercent, overdueMaintenanceCount, revenue, technicianUtilisationPercent]
+      properties:
+        from: { type: string, format: date }
+        to: { type: string, format: date }
+        jobsCompleted: { type: integer, format: int32 }
+        slaCompliancePercent: { type: number, format: double }
+        overdueMaintenanceCount: { type: integer, format: int32 }
+        revenue: { $ref: '#/components/schemas/Money' }
+        technicianUtilisationPercent: { type: number, format: double }
+    Conversation:
+      type: object
+      required: [id, kind, participantIds]
+      properties:
+        id: { type: string, format: uuid }
+        kind: { type: string, enum: [ops_worker, ops_customer] }
+        jobId: { type: string, format: uuid }
+        customerId: { type: string, format: uuid }
+        participantIds: { type: array, items: { type: string, format: uuid } }
+        lastMessageAt: { type: string, format: date-time }
+    ChatMessage:
+      type: object
+      required: [id, conversationId, senderUserId, body, sentAt]
+      properties:
+        id: { type: string, format: uuid }
+        conversationId: { type: string, format: uuid }
+        senderUserId: { type: string, format: uuid }
+        body: { type: string }
+        sentAt: { type: string, format: date-time }
+        hidden: { type: boolean }
+    SendMessageRequest:
+      type: object
+      required: [body]
+      properties:
+        body: { type: string, minLength: 1, maxLength: 4000 }
+        clientId: { type: string, format: uuid }

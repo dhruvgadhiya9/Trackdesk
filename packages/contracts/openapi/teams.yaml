@@ -1,0 +1,65 @@
+# Teams module — SCAFFOLD (Sprint 1). PRD: docs/prd/05-teams.md
+tags:
+  - name: Teams
+    description: Teams, technician skills and working hours.
+paths:
+  /v1/teams:
+    get:
+      tags: [Teams]
+      operationId: listTeams
+      x-roles: [company_owner, ops_manager, field_worker]
+      x-permission: teams:read
+      x-status: scaffold
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Team' } } } } }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+    post:
+      tags: [Teams]
+      operationId: createTeam
+      x-roles: [company_owner, ops_manager]
+      x-permission: teams:write
+      x-status: scaffold
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/CreateTeamRequest' } } }
+      responses:
+        '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/Team' } } } }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+  /v1/technicians/{userId}/working-hours:
+    put:
+      tags: [Teams]
+      operationId: setWorkingHours
+      x-roles: [company_owner, ops_manager]
+      x-permission: teams:write
+      x-status: scaffold
+      parameters:
+        - { name: userId, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/WorkingHours' } } } }
+      responses:
+        '204': { description: Saved }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+components:
+  schemas:
+    Team:
+      type: object
+      required: [id, name, memberIds]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        memberIds: { type: array, items: { type: string, format: uuid } }
+    CreateTeamRequest:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 100 }
+        memberIds: { type: array, items: { type: string, format: uuid } }
+    WorkingHours:
+      type: object
+      required: [dayOfWeek, startsAt, endsAt]
+      properties:
+        dayOfWeek: { type: integer, format: int32, minimum: 1, maximum: 7 }
+        startsAt: { type: string, pattern: '^([01]\d|2[0-3]):[0-5]\d$', example: '08:00' }
+        endsAt: { type: string, pattern: '^([01]\d|2[0-3]):[0-5]\d$', example: '17:00' }

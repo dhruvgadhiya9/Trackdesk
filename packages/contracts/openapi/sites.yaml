@@ -1,0 +1,76 @@
+# Sites module — SCAFFOLD (Sprint 1). PRD: docs/prd/02-sites.md
+tags:
+  - name: Sites
+    description: Customer sites with PostGIS location.
+paths:
+  /v1/sites:
+    get:
+      tags: [Sites]
+      operationId: listSites
+      x-roles: [company_owner, ops_manager, field_worker, customer]
+      x-permission: sites:read
+      x-status: scaffold
+      parameters:
+        - { name: customerId, in: query, required: false, schema: { type: string, format: uuid } }
+        - $ref: '#/components/parameters/Search'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/SitePage' } } } }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+    post:
+      tags: [Sites]
+      operationId: createSite
+      x-roles: [company_owner, ops_manager]
+      x-permission: sites:write
+      x-status: scaffold
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/CreateSiteRequest' } } }
+      responses:
+        '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/Site' } } } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+  /v1/sites/{siteId}:
+    parameters:
+      - { name: siteId, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      tags: [Sites]
+      operationId: getSite
+      x-roles: [company_owner, ops_manager, field_worker, customer]
+      x-permission: sites:read
+      x-status: scaffold
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Site' } } } }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+components:
+  schemas:
+    Site:
+      type: object
+      required: [id, customerId, name, status]
+      properties:
+        id: { type: string, format: uuid }
+        customerId: { type: string, format: uuid }
+        name: { type: string }
+        address: { $ref: '#/components/schemas/Address' }
+        location: { $ref: '#/components/schemas/GeoPoint' }
+        accessNotes: { type: string }
+        status: { type: string, enum: [active, archived] }
+        version: { type: integer, format: int64 }
+    SitePage:
+      type: object
+      required: [items, page]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/Site' } }
+        page: { $ref: '#/components/schemas/PageMeta' }
+    CreateSiteRequest:
+      type: object
+      required: [customerId, name]
+      properties:
+        customerId: { type: string, format: uuid }
+        name: { type: string, minLength: 1, maxLength: 200 }
+        address: { $ref: '#/components/schemas/Address' }
+        location: { $ref: '#/components/schemas/GeoPoint' }
+        accessNotes: { type: string, maxLength: 2000 }

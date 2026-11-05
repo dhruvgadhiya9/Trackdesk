@@ -1,0 +1,62 @@
+# Work orders module — SCAFFOLD (Sprint 2). PRD: docs/prd/07-work-orders.md
+tags:
+  - name: WorkOrders
+    description: Work orders linking customer, site and assets.
+paths:
+  /v1/work-orders:
+    get:
+      tags: [WorkOrders]
+      operationId: listWorkOrders
+      x-roles: [company_owner, ops_manager, customer]
+      x-permission: workorders:read
+      x-status: scaffold
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/WorkOrderPage' } } } }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+    post:
+      tags: [WorkOrders]
+      operationId: createWorkOrder
+      x-roles: [company_owner, ops_manager]
+      x-permission: workorders:write
+      x-status: scaffold
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/CreateWorkOrderRequest' } } }
+      responses:
+        '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/WorkOrder' } } } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+components:
+  schemas:
+    WorkOrder:
+      type: object
+      required: [id, reference, customerId, siteId, title, status, assetIds]
+      properties:
+        id: { type: string, format: uuid }
+        reference: { type: string }
+        customerId: { type: string, format: uuid }
+        siteId: { type: string, format: uuid }
+        title: { type: string }
+        description: { type: string }
+        priority: { $ref: '#/components/schemas/JobPriority' }
+        status: { type: string, enum: [open, in_progress, completed, cancelled] }
+        assetIds: { type: array, items: { type: string, format: uuid } }
+    WorkOrderPage:
+      type: object
+      required: [items, page]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/WorkOrder' } }
+        page: { $ref: '#/components/schemas/PageMeta' }
+    CreateWorkOrderRequest:
+      type: object
+      required: [customerId, siteId, title]
+      properties:
+        customerId: { type: string, format: uuid }
+        siteId: { type: string, format: uuid }
+        title: { type: string, minLength: 1, maxLength: 200 }
+        description: { type: string, maxLength: 4000 }
+        priority: { $ref: '#/components/schemas/JobPriority' }
+        assetIds: { type: array, items: { type: string, format: uuid } }

@@ -1,0 +1,208 @@
+# Users module — current user, users, invitations. PRDs: 00-tenant-onboarding, 04-users
+tags:
+  - name: Users
+    description: Users, roles and invitations.
+paths:
+  /v1/me:
+    get:
+      tags: [Users]
+      operationId: getMe
+      summary: The signed-in user, their tenant (if any), role and permissions.
+      x-roles: [any-authenticated]
+      x-permission: none
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Me' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /v1/users:
+    get:
+      tags: [Users]
+      operationId: listUsers
+      x-roles: [company_owner, ops_manager]
+      x-permission: users:read
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UserPage' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /v1/users/{userId}:
+    get:
+      tags: [Users]
+      operationId: getUser
+      x-roles: [company_owner, ops_manager]
+      x-permission: users:read
+      parameters:
+        - { name: userId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    patch:
+      tags: [Users]
+      operationId: updateUser
+      summary: Change role or status (Sprint 1).
+      x-roles: [company_owner]
+      x-permission: users:manage
+      parameters:
+        - { name: userId, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateUserRequest' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+  /v1/invitations:
+    get:
+      tags: [Users]
+      operationId: listInvitations
+      x-roles: [company_owner, ops_manager]
+      x-permission: users:invite
+      responses:
+        '200':
+          description: Pending invitations
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Invitation' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    post:
+      tags: [Users]
+      operationId: createInvitation
+      x-roles: [company_owner, ops_manager]
+      x-permission: users:invite
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateInvitationRequest' }
+      responses:
+        '201':
+          description: Created; the token is emailed, never returned.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Invitation' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /v1/invitations/{invitationId}:
+    delete:
+      tags: [Users]
+      operationId: revokeInvitation
+      x-roles: [company_owner, ops_manager]
+      x-permission: users:invite
+      parameters:
+        - { name: invitationId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '204': { description: Revoked }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /v1/invitations/accept:
+    post:
+      tags: [Users]
+      operationId: acceptInvitation
+      summary: Accept an invitation as the signed-in user (who must not belong to a tenant).
+      x-roles: [authenticated-without-tenant]
+      x-permission: none
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AcceptInvitationRequest' }
+      responses:
+        '200':
+          description: Joined
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Me' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '410': { description: Expired or already used, content: { application/problem+json: { schema: { $ref: '#/components/schemas/Problem' } } } }
+components:
+  schemas:
+    Me:
+      type: object
+      required: [userId, email, permissions]
+      properties:
+        userId: { type: string, format: uuid }
+        email: { type: string }
+        fullName: { type: string }
+        tenantId: { type: string, format: uuid }
+        tenantName: { type: string }
+        role: { $ref: '#/components/schemas/Role' }
+        permissions:
+          type: array
+          items: { type: string }
+    User:
+      type: object
+      required: [id, email, role, status]
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string }
+        fullName: { type: string }
+        phone: { type: string }
+        role: { $ref: '#/components/schemas/Role' }
+        status: { type: string, enum: [active, disabled] }
+        customerId: { type: string, format: uuid }
+        createdAt: { type: string, format: date-time }
+    UserPage:
+      type: object
+      required: [items, page]
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/User' }
+        page: { $ref: '#/components/schemas/PageMeta' }
+    UpdateUserRequest:
+      type: object
+      properties:
+        role: { $ref: '#/components/schemas/Role' }
+        status: { type: string, enum: [active, disabled] }
+        fullName: { type: string, maxLength: 200 }
+    Invitation:
+      type: object
+      required: [id, email, role, expiresAt, status]
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string }
+        role: { $ref: '#/components/schemas/Role' }
+        customerId: { type: string, format: uuid }
+        expiresAt: { type: string, format: date-time }
+        status: { type: string, enum: [pending, accepted, revoked, expired] }
+    CreateInvitationRequest:
+      type: object
+      required: [email, role]
+      properties:
+        email: { type: string, format: email, maxLength: 254 }
+        role:
+          type: string
+          enum: [company_owner, ops_manager, field_worker, customer]
+        customerId:
+          type: string
+          format: uuid
+          description: Required when role = customer.
+    AcceptInvitationRequest:
+      type: object
+      required: [token]
+      properties:
+        token: { type: string, minLength: 20, maxLength: 200 }
+        fullName: { type: string, maxLength: 200 }

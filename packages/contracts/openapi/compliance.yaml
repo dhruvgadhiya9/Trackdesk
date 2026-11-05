@@ -1,0 +1,76 @@
+# Compliance module — SCAFFOLD (Sprint 5). PRD: docs/prd/17-compliance-certificates.md
+# SECURITY-REVIEW-REQUIRED and requires compliance advisor sign-off.
+tags:
+  - name: Compliance
+    description: BS 5839 / BS 5266 certificates and records (immutable, versioned).
+paths:
+  /v1/certificates:
+    get:
+      tags: [Compliance]
+      operationId: listCertificates
+      x-roles: [company_owner, ops_manager, customer]
+      x-permission: compliance:read
+      x-status: scaffold
+      parameters:
+        - { name: siteId, in: query, required: false, schema: { type: string, format: uuid } }
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/CertificatePage' } } } }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+    post:
+      tags: [Compliance]
+      operationId: issueCertificate
+      x-roles: [company_owner, ops_manager]
+      x-permission: compliance:issue
+      x-status: scaffold
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/IssueCertificateRequest' } } }
+      responses:
+        '201': { description: Issued, content: { application/json: { schema: { $ref: '#/components/schemas/Certificate' } } } }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+  /v1/certificates/{certificateId}/download-url:
+    get:
+      tags: [Compliance]
+      operationId: getCertificateDownloadUrl
+      x-roles: [company_owner, ops_manager, customer]
+      x-permission: compliance:read
+      x-status: scaffold
+      parameters:
+        - { name: certificateId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/UploadUrl' } } } }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+components:
+  schemas:
+    Certificate:
+      type: object
+      required: [id, jobId, siteId, standard, certificateType, version, status]
+      properties:
+        id: { type: string, format: uuid }
+        jobId: { type: string, format: uuid }
+        siteId: { type: string, format: uuid }
+        standard: { $ref: '#/components/schemas/ComplianceStandard' }
+        certificateType: { type: string, enum: [inspection_servicing, periodic_test, commissioning, modification] }
+        version: { type: integer, format: int32 }
+        supersedesId: { type: string, format: uuid }
+        status: { type: string, enum: [draft, issued, superseded] }
+        issuedAt: { type: string, format: date-time }
+        contentSha256: { type: string }
+    CertificatePage:
+      type: object
+      required: [items, page]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/Certificate' } }
+        page: { $ref: '#/components/schemas/PageMeta' }
+    IssueCertificateRequest:
+      type: object
+      required: [jobId, certificateType]
+      properties:
+        jobId: { type: string, format: uuid }
+        certificateType: { type: string, enum: [inspection_servicing, periodic_test, commissioning, modification] }
+        supersedesId: { type: string, format: uuid }
+        correctionReason: { type: string, maxLength: 1000 }

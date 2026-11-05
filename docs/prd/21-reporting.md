@@ -1,5 +1,5 @@
 # PRD 21 — Reporting
-Linked Figma frame: TODO · Contract: `packages/contracts/openapi/reporting.yaml` · Sprint 6
+Linked Figma frame: TODO · Contract: `packages/contracts/openapi/reporting-chat.yaml` · Sprint 6
 
 ## User stories
 - As a company owner, I see jobs completed, SLA compliance %, overdue maintenance, revenue and technician utilisation for a date range.

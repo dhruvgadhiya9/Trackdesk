@@ -1,0 +1,122 @@
+# Jobs module — SCAFFOLD (Sprint 2). PRD: docs/prd/06-jobs.md
+tags:
+  - name: Jobs
+    description: Jobs and the job lifecycle state machine.
+paths:
+  /v1/jobs:
+    get:
+      tags: [Jobs]
+      operationId: listJobs
+      x-roles: [company_owner, ops_manager, field_worker, customer]
+      x-permission: jobs:read
+      x-status: scaffold
+      parameters:
+        - { name: status, in: query, required: false, schema: { $ref: '#/components/schemas/JobStatus' } }
+        - { name: assignedUserId, in: query, required: false, schema: { type: string, format: uuid } }
+        - { name: from, in: query, required: false, schema: { type: string, format: date-time } }
+        - { name: to, in: query, required: false, schema: { type: string, format: date-time } }
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/JobPage' } } } }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+    post:
+      tags: [Jobs]
+      operationId: createJob
+      x-roles: [company_owner, ops_manager]
+      x-permission: jobs:write
+      x-status: scaffold
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/CreateJobRequest' } } }
+      responses:
+        '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/Job' } } } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+  /v1/jobs/{jobId}:
+    get:
+      tags: [Jobs]
+      operationId: getJob
+      x-roles: [company_owner, ops_manager, field_worker, customer]
+      x-permission: jobs:read
+      x-status: scaffold
+      parameters:
+        - { name: jobId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Job' } } } }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+  /v1/jobs/{jobId}/transitions:
+    post:
+      tags: [Jobs]
+      operationId: transitionJob
+      x-roles: [company_owner, ops_manager, field_worker]
+      x-permission: jobs:transition
+      x-status: scaffold
+      parameters:
+        - { name: jobId, in: path, required: true, schema: { type: string, format: uuid } }
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/JobTransitionRequest' } } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Job' } } } }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+components:
+  schemas:
+    JobStatus:
+      type: string
+      enum: [draft, scheduled, dispatched, en_route, on_site, completed, verified, invoiced, cancelled, overdue]
+    JobPriority:
+      type: string
+      enum: [low, normal, high, emergency]
+    Job:
+      type: object
+      required: [id, reference, customerId, siteId, status, priority, jobType]
+      properties:
+        id: { type: string, format: uuid }
+        reference: { type: string, example: JOB-000123 }
+        customerId: { type: string, format: uuid }
+        siteId: { type: string, format: uuid }
+        siteName: { type: string }
+        workOrderId: { type: string, format: uuid }
+        maintenanceScheduleId: { type: string, format: uuid }
+        jobType: { type: string, enum: [service, repair, install, inspection, callout] }
+        standard: { $ref: '#/components/schemas/ComplianceStandard' }
+        status: { $ref: '#/components/schemas/JobStatus' }
+        priority: { $ref: '#/components/schemas/JobPriority' }
+        title: { type: string }
+        scheduledStart: { type: string, format: date-time }
+        scheduledEnd: { type: string, format: date-time }
+        assignedUserId: { type: string, format: uuid }
+        slaDueAt: { type: string, format: date-time }
+        version: { type: integer, format: int64 }
+    JobPage:
+      type: object
+      required: [items, page]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/Job' } }
+        page: { $ref: '#/components/schemas/PageMeta' }
+    CreateJobRequest:
+      type: object
+      required: [customerId, siteId, jobType]
+      properties:
+        clientId: { type: string, format: uuid, description: Client-generated id for offline creation. }
+        customerId: { type: string, format: uuid }
+        siteId: { type: string, format: uuid }
+        workOrderId: { type: string, format: uuid }
+        jobType: { type: string, enum: [service, repair, install, inspection, callout] }
+        standard: { $ref: '#/components/schemas/ComplianceStandard' }
+        priority: { $ref: '#/components/schemas/JobPriority' }
+        title: { type: string, maxLength: 200 }
+        scheduledStart: { type: string, format: date-time }
+        scheduledEnd: { type: string, format: date-time }
+    JobTransitionRequest:
+      type: object
+      required: [toStatus, version]
+      properties:
+        toStatus: { $ref: '#/components/schemas/JobStatus' }
+        version: { type: integer, format: int64 }
+        reason: { type: string, maxLength: 500 }

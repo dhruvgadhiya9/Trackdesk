@@ -1,0 +1,104 @@
+# Shared schemas, parameters and error responses (RFC 9457 Problem Details).
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      required: false
+      schema: { type: integer, format: int32, minimum: 0, default: 0 }
+    Size:
+      name: size
+      in: query
+      required: false
+      schema: { type: integer, format: int32, minimum: 1, maximum: 100, default: 20 }
+    Search:
+      name: search
+      in: query
+      required: false
+      schema: { type: string, maxLength: 100 }
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      description: Client-generated key; replays return the original response (offline sync).
+      schema: { type: string, maxLength: 100 }
+  schemas:
+    Problem:
+      type: object
+      description: RFC 9457 Problem Details.
+      required: [type, title, status]
+      properties:
+        type: { type: string, format: uri, example: 'https://trackdesk.app/problems/validation' }
+        title: { type: string }
+        status: { type: integer, format: int32 }
+        detail: { type: string }
+        instance: { type: string }
+        code: { type: string, description: Stable machine-readable error code. }
+        requestId: { type: string }
+        errors:
+          type: array
+          items: { $ref: '#/components/schemas/FieldError' }
+    FieldError:
+      type: object
+      required: [field, message]
+      properties:
+        field: { type: string }
+        message: { type: string }
+    PageMeta:
+      type: object
+      required: [page, size, totalElements, totalPages]
+      properties:
+        page: { type: integer, format: int32 }
+        size: { type: integer, format: int32 }
+        totalElements: { type: integer, format: int64 }
+        totalPages: { type: integer, format: int32 }
+    Role:
+      type: string
+      enum: [company_owner, ops_manager, portal_owner, customer, field_worker]
+    Address:
+      type: object
+      properties:
+        line1: { type: string, maxLength: 200 }
+        line2: { type: string, maxLength: 200 }
+        city: { type: string, maxLength: 100 }
+        postcode: { type: string, maxLength: 10 }
+    GeoPoint:
+      type: object
+      required: [latitude, longitude]
+      properties:
+        latitude: { type: number, format: double, minimum: -90, maximum: 90 }
+        longitude: { type: number, format: double, minimum: -180, maximum: 180 }
+    ComplianceStandard:
+      type: string
+      enum: [BS5839, BS5266, OTHER]
+  responses:
+    BadRequest:
+      description: Validation failed.
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Unauthorized:
+      description: Missing or invalid token.
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Forbidden:
+      description: Role lacks permission.
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    NotFound:
+      description: Not found (also returned for other tenants' resources).
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Conflict:
+      description: Conflict (optimistic lock, invalid state transition, duplicate).
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    NotImplemented:
+      description: Scaffolded endpoint, not implemented yet.
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }

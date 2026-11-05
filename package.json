@@ -1,0 +1,36 @@
+{
+  "name": "trackdesk",
+  "private": true,
+  "packageManager": "pnpm@10.34.9",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:isolation": "turbo run test:isolation",
+    "e2e": "turbo run e2e",
+    "storybook": "pnpm --filter @trackdesk/ui storybook",
+    "contracts:generate": "pnpm --filter @trackdesk/contracts generate",
+    "contracts:check": "pnpm contracts:generate && git diff --exit-code -- packages/contracts/generated packages/contracts/src/generated apps/api/src/main/java/com/trackdesk/platform/security/Permission.java apps/api/src/main/resources/db/migration/R__role_permissions.sql",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset && pnpm db:migrate && pnpm db:seed",
+    "db:migrate": "pnpm --filter @trackdesk/api db:migrate",
+    "db:seed": "node scripts/db-seed.mjs",
+    "tokens:sync": "tsx scripts/figma-tokens-sync.ts",
+    "review-queue:check": "node scripts/review-queue-check.mjs",
+    "format": "prettier --write \"**/*.{ts,tsx,js,mjs,json,md,yaml,yml}\""
+  },
+  "devDependencies": {
+    "prettier": "3.6.2",
+    "supabase": "2.122.1",
+    "tsx": "4.20.6",
+    "turbo": "2.5.8",
+    "typescript": "5.9.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild", "supabase", "@swc/core", "sharp", "unrs-resolver"]
+  }
+}

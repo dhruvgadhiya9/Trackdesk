@@ -1,5 +1,5 @@
 # PRD 18 — Quotes
-Linked Figma frame: TODO · Contract: `packages/contracts/openapi/quotes.yaml` · Sprint 6
+Linked Figma frame: TODO · Contract: `packages/contracts/openapi/billing.yaml` · Sprint 6
 
 ## User stories
 - As an ops manager, I create a quote with line items (VAT per line) for a customer's site and send it.

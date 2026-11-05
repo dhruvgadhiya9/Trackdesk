@@ -1,0 +1,133 @@
+# Field work module — SCAFFOLD (Sprint 4). PRDs: 12-job-execution, 13-gps-geofence, 14-offline-sync
+# SECURITY-REVIEW-REQUIRED: location data and consent.
+tags:
+  - name: Fieldwork
+    description: Field execution, checklists, media, consent, location and offline sync.
+paths:
+  /v1/fieldwork/my-jobs:
+    get:
+      tags: [Fieldwork]
+      operationId: listMyJobs
+      x-roles: [field_worker]
+      x-permission: fieldwork:execute
+      x-status: scaffold
+      parameters:
+        - { name: date, in: query, required: false, schema: { type: string, format: date } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Job' } } } } }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+  /v1/fieldwork/jobs/{jobId}/checklist:
+    put:
+      tags: [Fieldwork]
+      operationId: saveChecklistAnswers
+      x-roles: [field_worker]
+      x-permission: fieldwork:execute
+      x-status: scaffold
+      parameters:
+        - { name: jobId, in: path, required: true, schema: { type: string, format: uuid } }
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/ChecklistAnswer' } } } }
+      responses:
+        '204': { description: Saved }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+  /v1/fieldwork/jobs/{jobId}/photos/upload-url:
+    post:
+      tags: [Fieldwork]
+      operationId: createPhotoUploadUrl
+      x-roles: [field_worker]
+      x-permission: fieldwork:execute
+      x-status: scaffold
+      parameters:
+        - { name: jobId, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/UploadUrlRequest' } } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/UploadUrl' } } } }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+  /v1/fieldwork/location-consent:
+    get:
+      tags: [Fieldwork]
+      operationId: getLocationConsent
+      x-roles: [field_worker]
+      x-permission: location:report
+      x-status: scaffold
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/LocationConsent' } } } }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+    put:
+      tags: [Fieldwork]
+      operationId: setLocationConsent
+      x-roles: [field_worker]
+      x-permission: location:report
+      x-status: scaffold
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/SetLocationConsentRequest' } } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/LocationConsent' } } } }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+  /v1/fieldwork/location-pings:
+    post:
+      tags: [Fieldwork]
+      operationId: reportLocationPings
+      x-roles: [field_worker]
+      x-permission: location:report
+      x-status: scaffold
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: array, maxItems: 500, items: { $ref: '#/components/schemas/LocationPing' } } } }
+      responses:
+        '202': { description: Accepted }
+        '422': { description: Outside consent / working hours / active job, content: { application/problem+json: { schema: { $ref: '#/components/schemas/Problem' } } } }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+components:
+  schemas:
+    ChecklistAnswer:
+      type: object
+      required: [itemKey, answer, answeredAt]
+      properties:
+        assetId: { type: string, format: uuid }
+        itemKey: { type: string }
+        answer: { type: string, enum: [pass, fail, na] }
+        notes: { type: string, maxLength: 2000 }
+        answeredAt: { type: string, format: date-time }
+    UploadUrlRequest:
+      type: object
+      required: [contentType]
+      properties:
+        contentType: { type: string, enum: [image/jpeg, image/png, image/heic] }
+        clientId: { type: string, format: uuid }
+    UploadUrl:
+      type: object
+      required: [url, path, expiresAt]
+      properties:
+        url: { type: string, format: uri }
+        path: { type: string }
+        expiresAt: { type: string, format: date-time }
+    LocationConsent:
+      type: object
+      required: [granted]
+      properties:
+        granted: { type: boolean }
+        consentVersion: { type: string }
+        grantedAt: { type: string, format: date-time }
+        revokedAt: { type: string, format: date-time }
+    SetLocationConsentRequest:
+      type: object
+      required: [granted, consentVersion]
+      properties:
+        granted: { type: boolean }
+        consentVersion: { type: string, maxLength: 20 }
+    LocationPing:
+      type: object
+      required: [latitude, longitude, recordedAt]
+      properties:
+        jobId: { type: string, format: uuid }
+        latitude: { type: number, format: double, minimum: -90, maximum: 90 }
+        longitude: { type: number, format: double, minimum: -180, maximum: 180 }
+        accuracyMeters: { type: number, format: double }
+        recordedAt: { type: string, format: date-time }

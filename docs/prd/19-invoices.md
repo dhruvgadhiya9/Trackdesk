@@ -1,5 +1,5 @@
 # PRD 19 — Invoices
-Linked Figma frame: TODO · Contract: `packages/contracts/openapi/invoices.yaml` · Sprint 6
+Linked Figma frame: TODO · Contract: `packages/contracts/openapi/billing.yaml` · Sprint 6
 
 ## User stories
 - As an ops manager, I generate an invoice from a verified job, with UK VAT, and send it with a pay link.

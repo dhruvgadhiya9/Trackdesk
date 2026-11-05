@@ -1,0 +1,28 @@
+# Platform — feature flags (consumed by the web/mobile useFeatureFlag hook).
+tags:
+  - name: Platform
+    description: Feature flags and platform utilities.
+paths:
+  /v1/feature-flags:
+    get:
+      tags: [Platform]
+      operationId: getFeatureFlags
+      summary: Effective feature flags for the caller's tenant.
+      x-roles: [company_owner, ops_manager, field_worker, customer]
+      x-permission: featureflags:read
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FeatureFlags' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+components:
+  schemas:
+    FeatureFlags:
+      type: object
+      required: [flags]
+      properties:
+        flags:
+          type: object
+          additionalProperties: { type: boolean }

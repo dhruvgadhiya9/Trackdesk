@@ -24,8 +24,8 @@ Status: DRAFT. The PM reviews and owns these.
 | 15 | [Happy Code OTP](15-happy-code.md) | 5 | `openapi/verification.yaml` | Scaffold |
 | 16 | [Customer portal](16-customer-portal.md) | 5 | `openapi/portal.yaml` | Scaffold |
 | 17 | [Compliance certificates](17-compliance-certificates.md) | 5 | `openapi/compliance.yaml` | Scaffold |
-| 18 | [Quotes](18-quotes.md) | 6 | `openapi/quotes.yaml` | Scaffold |
-| 19 | [Invoices](19-invoices.md) | 6 | `openapi/invoices.yaml` | Scaffold |
-| 20 | [Payments](20-payments.md) | 6 | `openapi/payments.yaml` | Scaffold |
-| 21 | [Reporting](21-reporting.md) | 6 | `openapi/reporting.yaml` | Scaffold |
-| 22 | [Chat](22-chat.md) | 6 | `openapi/chat.yaml` | Scaffold |
+| 18 | [Quotes](18-quotes.md) | 6 | `openapi/billing.yaml` | Scaffold |
+| 19 | [Invoices](19-invoices.md) | 6 | `openapi/billing.yaml` | Scaffold |
+| 20 | [Payments](20-payments.md) | 6 | `openapi/billing.yaml` | Scaffold |
+| 21 | [Reporting](21-reporting.md) | 6 | `openapi/reporting-chat.yaml` | Scaffold |
+| 22 | [Chat](22-chat.md) | 6 | `openapi/reporting-chat.yaml` | Scaffold |

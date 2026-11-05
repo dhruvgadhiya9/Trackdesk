@@ -1,0 +1,77 @@
+# SECURITY-REVIEW-REQUIRED: role permission matrix — the single source of truth.
+# Changes require Tech Lead + PM approval and a second reviewer (CODEOWNERS).
+#
+# `pnpm contracts:generate` turns this into:
+#   - apps/api/src/main/java/com/trackdesk/platform/security/Permission.java  (Spring Security authorities)
+#   - apps/api/src/main/resources/db/migration/R__role_permissions.sql       (role_permission table, used by RLS)
+#   - packages/contracts/src/generated/permissions.ts                        (web/mobile UI gating)
+#
+# Rules: least privilege; portal_owner never gets tenant-data permissions; field_worker and
+# customer data access is further narrowed by RLS (own jobs / own customer).
+roles:
+  company_owner: Owner of a contractor company (tenant admin).
+  ops_manager: Operations manager — runs scheduling, dispatch and customers.
+  field_worker: Technician using the mobile app.
+  customer: Contractor's customer using the portal (own customer records only).
+  portal_owner: TrackDesk platform admin (no tenant data access).
+
+permissions:
+  tenant:read: { description: Read own company profile, roles: [company_owner, ops_manager, field_worker, customer] }
+  featureflags:read: { description: Read effective feature flags, roles: [company_owner, ops_manager, field_worker, customer, portal_owner] }
+  featureflags:manage: { description: Manage feature flags per tenant, roles: [portal_owner] }
+  platform:tenants:read: { description: List tenants (platform admin), roles: [portal_owner] }
+  audit:read: { description: Read the audit log, roles: [company_owner] }
+
+  users:read: { description: List and view users, roles: [company_owner, ops_manager] }
+  users:invite: { description: Invite users and manage invitations, roles: [company_owner, ops_manager] }
+  users:manage: { description: Change roles and disable users, roles: [company_owner] }
+
+  customers:read: { description: View customers, roles: [company_owner, ops_manager, field_worker, customer] }
+  customers:create: { description: Create customers, roles: [company_owner, ops_manager] }
+  customers:update: { description: Update customers, roles: [company_owner, ops_manager] }
+  customers:archive: { description: Archive customers, roles: [company_owner, ops_manager] }
+
+  sites:read: { description: View sites, roles: [company_owner, ops_manager, field_worker, customer] }
+  sites:write: { description: Create and update sites, roles: [company_owner, ops_manager] }
+  assets:read: { description: View assets, roles: [company_owner, ops_manager, field_worker, customer] }
+  assets:write: { description: Create and update assets, roles: [company_owner, ops_manager] }
+  teams:read: { description: View teams, roles: [company_owner, ops_manager, field_worker] }
+  teams:write: { description: Manage teams, skills and working hours, roles: [company_owner, ops_manager] }
+
+  jobs:read: { description: View jobs, roles: [company_owner, ops_manager, field_worker, customer] }
+  jobs:write: { description: Create and edit jobs, roles: [company_owner, ops_manager] }
+  jobs:transition: { description: Change job status (field workers limited to own jobs and field transitions), roles: [company_owner, ops_manager, field_worker] }
+  workorders:read: { description: View work orders, roles: [company_owner, ops_manager, customer] }
+  workorders:write: { description: Manage work orders, roles: [company_owner, ops_manager] }
+  maintenance:read: { description: View PM schedules, roles: [company_owner, ops_manager, customer] }
+  maintenance:write: { description: Manage PM schedules, roles: [company_owner, ops_manager] }
+
+  dispatch:read: { description: View the dispatch board and suggestions, roles: [company_owner, ops_manager] }
+  dispatch:assign: { description: Assign and schedule jobs, roles: [company_owner, ops_manager] }
+
+  fieldwork:execute: { description: Execute assigned jobs (checklists, photos, signatures), roles: [field_worker] }
+  location:report: { description: Report own location (with consent), roles: [field_worker] }
+  location:read: { description: View technician locations, roles: [company_owner, ops_manager] }
+
+  verification:verify: { description: Send and verify Happy Codes, roles: [company_owner, ops_manager, field_worker] }
+  verification:override: { description: Verify a job without a Happy Code (reason required), roles: [company_owner, ops_manager] }
+
+  compliance:read: { description: View certificates and records, roles: [company_owner, ops_manager, customer] }
+  compliance:issue: { description: Issue and correct certificates, roles: [company_owner, ops_manager] }
+
+  portal:access: { description: Use the customer portal, roles: [customer] }
+  portal:request-job: { description: Request a job from the portal, roles: [customer] }
+
+  quotes:read: { description: View quotes, roles: [company_owner, ops_manager, customer] }
+  quotes:write: { description: Create and send quotes, roles: [company_owner, ops_manager] }
+  quotes:accept: { description: Accept a quote, roles: [company_owner, ops_manager, customer] }
+  invoices:read: { description: View invoices, roles: [company_owner, ops_manager, customer] }
+  invoices:write: { description: Create and issue invoices, roles: [company_owner, ops_manager] }
+  payments:read: { description: View payments, roles: [company_owner, ops_manager, customer] }
+  payments:collect: { description: Create pay links, roles: [company_owner, ops_manager, customer] }
+
+  reporting:read: { description: View reports, roles: [company_owner, ops_manager] }
+
+  chat:read: { description: Read conversations you participate in, roles: [company_owner, ops_manager, field_worker, customer] }
+  chat:write: { description: Send messages, roles: [company_owner, ops_manager, field_worker, customer] }
+  chat:moderate: { description: Hide messages, roles: [company_owner, ops_manager] }
