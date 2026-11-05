@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- JSON logs (logstash encoder) everywhere except local, with MDC tenant_id, user_id, request_id. -->
+<configuration>
+  <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+  <springProfile name="local | test">
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%d{HH:mm:ss.SSS} %5p [%X{request_id:-}] [t=%X{tenant_id:-}] [u=%X{user_id:-}] %logger{36} - %m%n"/>
+    <root level="INFO">
+      <appender-ref ref="CONSOLE"/>
+    </root>
+  </springProfile>
+
+  <springProfile name="!(local | test)">
+    <appender name="JSON" class="ch.qos.logback.core.ConsoleAppender">
+      <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+        <includeMdcKeyName>request_id</includeMdcKeyName>
+        <includeMdcKeyName>tenant_id</includeMdcKeyName>
+        <includeMdcKeyName>user_id</includeMdcKeyName>
+        <customFields>{"service":"trackdesk-api"}</customFields>
+      </encoder>
+    </appender>
+    <root level="INFO">
+      <appender-ref ref="JSON"/>
+    </root>
+  </springProfile>
+</configuration>

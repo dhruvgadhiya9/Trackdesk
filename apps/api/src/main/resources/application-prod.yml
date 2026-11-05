@@ -1,0 +1,14 @@
+# Production (UK region: London). Deployed by a human only. Secrets from the secret manager.
+trackdesk:
+  security:
+    jwk-set-uri: ${SUPABASE_JWKS_URL}
+    issuer: ${SUPABASE_JWT_ISSUER}
+  auth-admin:
+    provider: supabase
+spring:
+  datasource:
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:20}
+sentry:
+  environment: production
+  traces-sample-rate: 0.05

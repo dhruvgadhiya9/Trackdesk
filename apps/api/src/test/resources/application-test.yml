@@ -1,0 +1,19 @@
+# Test profile: datasource/flyway URLs and credentials come from IntegrationTest (Testcontainers).
+trackdesk:
+  web-base-url: http://localhost:3000
+  security:
+    # TEST-ONLY HS256 secret (synthetic). HS256 is rejected outside local/test profiles.
+    hmac-secret: test-only-secret-trackdesk-0123456789-abcdefghijklmnop
+    jwk-set-uri: ""
+    issuer: ""
+  auth-admin:
+    provider: fake
+
+sentry:
+  dsn: ""
+
+logging:
+  level:
+    root: WARN
+    com.trackdesk: INFO
+    org.flywaydb: WARN

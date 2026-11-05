@@ -1,0 +1,27 @@
+# Copy to application-local.yml (git-ignored) and run with --spring.profiles.active=local.
+# Values below are LOCAL placeholders only (local Supabase CLI stack + bootstrap roles).
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:54322/postgres
+    username: trackdesk_app
+    password: trackdesk_app_local
+  flyway:
+    user: trackdesk_owner
+    password: trackdesk_owner_local
+
+trackdesk:
+  web-base-url: http://localhost:3000
+  security:
+    # Local Supabase CLI signs tokens with this well-known development secret (see `supabase status`).
+    # HS256 is rejected outside the local/test profiles.
+    hmac-secret: super-secret-jwt-token-with-at-least-32-characters-long
+    issuer: http://127.0.0.1:54321/auth/v1
+  auth-admin:
+    # "supabase" writes app_metadata to the local Auth server; "fake" keeps it in memory.
+    provider: supabase
+    supabase-url: http://127.0.0.1:54321
+    service-role-key: <paste the local service_role key from `pnpm supabase status`>
+
+logging:
+  level:
+    com.trackdesk: DEBUG

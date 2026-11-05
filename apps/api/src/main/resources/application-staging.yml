@@ -1,0 +1,10 @@
+# Staging (UK region). All secrets injected from the secret manager by the platform — never here.
+trackdesk:
+  security:
+    jwk-set-uri: ${SUPABASE_JWKS_URL}
+    issuer: ${SUPABASE_JWT_ISSUER}
+  auth-admin:
+    provider: supabase
+sentry:
+  environment: staging
+  traces-sample-rate: 0.1
