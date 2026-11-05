@@ -18,12 +18,12 @@ must be updated in the same PR as any migration.
 ## RLS helper functions (V1)
 | Function | Returns |
 |---|---|
-| `app_current_tenant()` | `app.tenant_id` setting, else the Supabase JWT `app_metadata.tenant_id`, else NULL (fail closed) |
+| `app_current_tenant()` | `app.tenant_id` setting, else the Supabase JWT `app_metadata.tenant_id` (Realtime/PostgREST), else NULL (fail closed) |
 | `app_current_user()` | `app.user_id`, else JWT `sub` |
 | `app_current_role()` | `app.role`, else JWT `app_metadata.role` |
 | `app_has_permission(text)` | whether `role_permission` grants the current role the permission |
 | `app_current_customer()` | `customer_id` of the current user if role = customer |
-| `app_find_invitation(token_hash)` | SECURITY DEFINER lookup for invite accept (no tenant context yet). SECURITY-REVIEW-REQUIRED |
+| (capability) `app.invite_token_hash` setting | Lets a tenant-less invitee read/accept ONLY the invitation whose token hash they present (policies on `invitation`, `app_user`; DECISIONS D-015). SECURITY-REVIEW-REQUIRED |
 
 ## Tables
 Legend for RLS intent: **T** = tenant isolation (all ops); **T+C** = tenant isolation plus a

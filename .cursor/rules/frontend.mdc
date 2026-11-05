@@ -1,0 +1,14 @@
+---
+description: Web rules (apps/web, apps/customer, packages/ui)
+globs: apps/web/**,apps/customer/**,packages/ui/**
+---
+- UI only from `@trackdesk/ui` components; styling only via the token-based Tailwind preset
+  (`bg-primary`, `text-fg-muted`, `p-4`, `rounded-md`). No raw hex/rgb, no arbitrary values (`p-[13px]`) —
+  lint rule `design-tokens/no-raw-design-values`. Raw values live only in packages/ui/src/tokens.ts (Figma sync).
+- Missing component? Add it to packages/ui with a Storybook story covering every variant first.
+- Data via the generated client from `@trackdesk/contracts` + `unwrap()`; types from generated models only.
+- Every data screen has loading, empty and error states (LoadingState / EmptyState / ErrorState) and works at 1280 and 1440.
+- Role areas: `(owner)` /owner, `(ops)` /ops, `(portal-owner)` /platform via `RoleShell` (UI gating only; the API enforces).
+- Tests: Playwright spec per screen in `e2e/` (mock mode `NEXT_PUBLIC_API_MOCKS=1`) incl. axe WCAG 2.1 AA check;
+  mock data only from `@trackdesk/contracts/mocks`.
+- Use the screen prompt template in docs/09-figma-to-code.md for Figma frames.

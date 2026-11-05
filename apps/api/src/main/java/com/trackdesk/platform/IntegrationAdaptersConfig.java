@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
 /**
  * Chooses real vs fake adapters by property. Fakes are the default so a misconfigured environment
@@ -35,8 +36,10 @@ public class IntegrationAdaptersConfig {
   }
 
   @Bean
-  EmailSender emailSender() {
+  EmailSender emailSender(
+      @Value("${trackdesk.email.log-links:false}") boolean logLinks, Environment env) {
     // TODO(Sprint 1): real provider adapter (UK/EU region) behind trackdesk.email.provider.
-    return new FakeEmailSender();
+    boolean local = env.matchesProfiles("local");
+    return new FakeEmailSender(logLinks && local);
   }
 }

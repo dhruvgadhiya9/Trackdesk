@@ -1,0 +1,32 @@
+name: E2E nightly (staging)
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # 02:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  playwright-staging:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @trackdesk/web exec playwright install --with-deps chromium
+      - name: Run Playwright against staging (mock-only specs are skipped)
+        run: pnpm --filter @trackdesk/web e2e
+        env:
+          CI: 'true'
+          # Set in the GitHub "staging" environment by a human. Synthetic test accounts only.
+          E2E_BASE_URL: ${{ vars.STAGING_WEB_URL }}
+          E2E_OWNER_EMAIL: ${{ secrets.E2E_OWNER_EMAIL }}
+          E2E_OWNER_PASSWORD: ${{ secrets.E2E_OWNER_PASSWORD }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: playwright-staging-report, path: apps/web/playwright-report }

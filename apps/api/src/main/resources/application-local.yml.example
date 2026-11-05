@@ -2,7 +2,7 @@
 # Values below are LOCAL placeholders only (local Supabase CLI stack + bootstrap roles).
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:54322/postgres
+    url: jdbc:postgresql://localhost:54422/postgres
     username: trackdesk_app
     password: trackdesk_app_local
   flyway:
@@ -12,15 +12,21 @@ spring:
 trackdesk:
   web-base-url: http://localhost:3000
   security:
-    # Local Supabase CLI signs tokens with this well-known development secret (see `supabase status`).
-    # HS256 is rejected outside the local/test profiles.
-    hmac-secret: super-secret-jwt-token-with-at-least-32-characters-long
-    issuer: http://127.0.0.1:54321/auth/v1
+    # Supabase CLI 2.x signs user access tokens with ES256 (asymmetric) -> verify via JWKS, the
+    # same path as staging/prod. For older CLIs that still use HS256, set hmac-secret instead
+    # (JWT_SECRET from `pnpm supabase status`); HS256 is rejected outside local/test.
+    jwk-set-uri: http://127.0.0.1:54421/auth/v1/.well-known/jwks.json
+    # hmac-secret: <JWT_SECRET from `pnpm supabase status`>
+    issuer: http://127.0.0.1:54421/auth/v1
   auth-admin:
     # "supabase" writes app_metadata to the local Auth server; "fake" keeps it in memory.
     provider: supabase
-    supabase-url: http://127.0.0.1:54321
+    supabase-url: http://127.0.0.1:54421
     service-role-key: <paste the local service_role key from `pnpm supabase status`>
+
+  email:
+    # Local only: print invitation accept links in the API log (no mail provider locally).
+    log-links: true
 
 logging:
   level:

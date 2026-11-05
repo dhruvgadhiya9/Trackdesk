@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  contracts:
+    name: Contract drift + permission matrix
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - name: Regenerate from OpenAPI + permissions.yaml and fail on drift
+        run: pnpm contracts:check
+      - name: Every SECURITY-REVIEW-REQUIRED file is in docs/REVIEW-QUEUE.md
+        run: pnpm review-queue:check
+
+  js:
+    name: JS lint, typecheck, unit tests, builds
+    runs-on: ubuntu-latest
+    needs: contracts
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm turbo run lint typecheck test --filter=!@trackdesk/api
+      - run: pnpm turbo run build --filter=@trackdesk/web --filter=@trackdesk/customer
+      - run: pnpm --filter @trackdesk/ui build-storybook
+
+  web-e2e:
+    name: Playwright (mock API) + axe
+    runs-on: ubuntu-latest
+    needs: js
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @trackdesk/web exec playwright install --with-deps chromium
+      - run: pnpm --filter @trackdesk/web e2e
+        env: { CI: 'true' }
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with: { name: playwright-report, path: apps/web/playwright-report }
+
+  api:
+    name: Java build (Spotless, unit, Testcontainers, Modulith, ArchUnit)
+    runs-on: ubuntu-latest
+    needs: contracts
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21, cache: gradle }
+      - name: Gradle build (includes isolation suite and architecture tests)
+        working-directory: apps/api
+        run: ./gradlew build --no-daemon
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: api-test-reports
+          path: |
+            apps/api/build/reports/tests
+            apps/api/build/reports/jacoco
+
+  isolation:
+    name: Tenant isolation suite (blocking, separately visible)
+    runs-on: ubuntu-latest
+    needs: contracts
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21, cache: gradle }
+      - working-directory: apps/api
+        run: ./gradlew isolationTest --no-daemon
+
+  secrets-scan:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

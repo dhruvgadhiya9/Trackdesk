@@ -1,0 +1,45 @@
+# SECURITY-REVIEW-REQUIRED: uses the ANTHROPIC_API_KEY repository secret (set by a human).
+# First-pass AI review only. A human approval is still required on every merge (branch protection).
+name: Claude Code review
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  id-token: write
+
+jobs:
+  review:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            You are the first-pass reviewer for TrackDesk. Review this pull request against
+            CLAUDE.md (authoritative rules), docs/07-definition-of-done.md and the Gherkin
+            acceptance criteria in the linked PRD under docs/prd/.
+
+            Check specifically:
+            1. Tenant isolation: every new tenant table has tenant_id, an index leading with it,
+               ENABLE + FORCE RLS, explicit policies, grants, composite FKs, and a seed row in
+               apps/api/src/test/resources/isolation/seed.sql. Every implemented endpoint has a
+               @Covers test in CrossTenantApiTest.
+            2. Controllers implement generated OpenAPI interfaces; no repository access from
+               controllers; no raw SQL outside repositories; @PreAuthorize uses Permission constants.
+            3. Contract-first: OpenAPI spec changed together with code; generated files regenerated.
+            4. UI uses only @trackdesk/ui / ui-native components and tokens; loading/empty/error states.
+            5. Tests exist for every Gherkin scenario touched.
+            6. Anything touching auth, permissions, RLS, payments, location data or compliance
+               certificates is marked SECURITY-REVIEW-REQUIRED and listed in docs/REVIEW-QUEUE.md.
+            7. No secrets, keys or real customer data.
+
+            Post one summary comment with Blocking / Should fix / Nits. Never approve the PR.
+          claude_args: --max-turns 20

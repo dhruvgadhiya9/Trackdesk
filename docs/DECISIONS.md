@@ -39,14 +39,12 @@ ambiguous or unavailable; a human should confirm or reverse them.
   (server-writable only; users can't edit `app_metadata`). `user_id` = `sub`.
 - A user belongs to exactly one tenant in v1 (conservative). Multi-tenant membership is deferred.
 
-## D-005 · 2026-11-06 · RLS session variables set per transaction (conservative default)
-- `TenantAwareDataSource` wraps the pool. On each connection checkout it runs
-  `select set_config('app.tenant_id', ?, false)` plus `app.user_id` and `app.role`. On return it
-  calls `reset`.
-- The prompt pack asks for `set_config(..., true)` (transaction-local) *at the start of every
-  transaction*. The `TenantTransactionListener` does that inside each Spring transaction. The
-  connection-level set is defence in depth, cleared on release. **Policies fail closed:** with no
-  setting, `current_setting('app.tenant_id', true)` is NULL and no rows match.
+## D-005 · 2026-11-06 · RLS settings written per transaction only (conservative default)
+- `TenantAwareJpaTransactionManager.doBegin` runs `select set_config(?, ?, true)` for `app.tenant_id`,
+  `app.user_id`, `app.role`, `app.customer_id` (+ allowed extra `app.*` capability settings) as the first
+  statement of EVERY transaction, then enables the Hibernate `tenantFilter`. `is_local = true` means
+  nothing survives on a pooled connection. Work outside a transaction sees NO tenant and fails closed.
+- `open-in-view` is disabled so connections are only used inside transactions.
 - `SECURITY-REVIEW-REQUIRED`.
 
 ## D-006 · 2026-11-06 · API DB role
@@ -71,3 +69,37 @@ ambiguous or unavailable; a human should confirm or reverse them.
 
 ## D-010 · 2026-11-06 · Audit log is append-only via DB grants + trigger
 - `audit_event`: the app role has `INSERT, SELECT` only, and a trigger rejects UPDATE/DELETE.
+
+## D-011 · 2026-11-06 · Onboarding writes auth claims inside the DB transaction
+- Company creation and invite acceptance call the Supabase Admin API (`app_metadata`) as the LAST step
+  before commit, after an explicit flush. A provider failure rolls the DB back. Rare residual case:
+  commit fails after the admin call succeeds, which leaves claims pointing at a missing tenant. Mitigation
+  to design (Tech Lead): a reconciliation job. Listed in REVIEW-QUEUE #8.
+
+## D-012 · 2026-11-06 · Cloud provider not decided
+- Draft Terraform targets AWS eu-west-2 (ECS Fargate). GCP europe-west2 (Cloud Run) is equally valid.
+  Human decision; nothing has been applied.
+
+## D-013 · 2026-11-06 · Local Supabase uses ports 544xx
+- This machine already runs another Supabase project on the default 543xx ports. TrackDesk's local stack
+  uses API 54421 / DB 54422 / Studio 54423 / Inbucket 54424 so both can run side by side.
+
+## D-014 · 2026-11-06 · Local JWT verification uses JWKS (ES256)
+- Supabase CLI 2.x signs user access tokens with ES256 (the anon key is still HS256). The local profile
+  therefore verifies via `/auth/v1/.well-known/jwks.json`, the same code path as staging/prod. HS256 stays
+  supported only for the `local`/`test` profiles (tests mint HS256 tokens).
+
+## D-015 · 2026-11-06 · Invitation lookup by capability policy (no SECURITY DEFINER)
+- Instead of a SECURITY DEFINER lookup function, the `invitation` select/update policies also allow
+  access when `token_hash = current_setting('app.invite_token_hash')`. The `app_user` insert policy lets a
+  user insert ONLY themselves, with the invited role, while a matching valid invitation exists.
+  A 256-bit token makes the capability unguessable. No RLS bypass exists anywhere. SECURITY-REVIEW-REQUIRED.
+
+## D-016 · 2026-11-06 · Scaffolded endpoints return 501
+- Controllers for Sprint 1–6 modules implement their generated interfaces with no overrides, so routes
+  exist, need authentication and return 501. The cross-tenant coverage test forces an isolation test as
+  soon as any of them is implemented.
+
+## D-017 · 2026-11-06 · Local-only invite link logging
+- With no mail provider locally, `trackdesk.email.log-links=true` (honoured ONLY with the `local`
+  profile) logs invitation accept links. Never enabled in shared environments.

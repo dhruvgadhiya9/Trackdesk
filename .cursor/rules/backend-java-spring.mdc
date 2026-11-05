@@ -1,0 +1,19 @@
+---
+description: Spring Boot API rules (apps/api)
+globs: apps/api/**/*.java,apps/api/**/*.kts
+---
+- Module layout `com.trackdesk.<module>/{api,application,domain,infrastructure}` + package-info `@ApplicationModule`;
+  `application` is `@NamedInterface("application")` — the only thing other modules may use (or events).
+- Controllers: `@RestController` implementing the generated `com.trackdesk.contracts.api.*Api`; thin; every
+  method has `@PreAuthorize("hasAuthority('" + Permission.X + "')")`. No repositories/EntityManager in controllers.
+- Services: `@Transactional`, `@Audited(action, entityType)` on state changes, return generated DTOs via MapStruct
+  (`@Mapper(uses = TimeMapper.class)`; constructor injection is configured globally).
+- Entities extend `TenantScopedEntity` (tenant assigned from TenantContext, never from input). Optimistic locking
+  with `@Version Long version` for aggregates edited by users.
+- Queries only in `infrastructure/` repositories. Never add a tenant predicate as the ONLY protection — RLS is the
+  guard; never bypass `TenantContext`/`TenantAwareJpaTransactionManager`; never call `TenantContext.callAs`
+  outside platform.tenancy (use `TenantTransactions` for reviewed privileged flows only).
+- Errors: throw `ApiException.notFound/conflict/forbidden/gone/badRequest` → RFC 9457 Problem Details. Return 404
+  (not 403) for other tenants' resources.
+- External calls: port interface in `application/`, adapter + fake in `infrastructure/`, selected by property.
+- Format with `./gradlew spotlessApply`; `./gradlew build` must pass (Spotless, tests, Modulith, ArchUnit).

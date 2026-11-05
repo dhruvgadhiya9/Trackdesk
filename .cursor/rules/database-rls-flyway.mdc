@@ -1,0 +1,15 @@
+---
+description: Database, Flyway and RLS rules
+globs: apps/api/src/main/resources/db/**,apps/api/scripts/**,apps/api/src/test/resources/isolation/**
+---
+- Flyway is the ONLY migration tool. Plain SQL, new file per change (`V<n>__<module>.sql`); never edit an applied migration.
+- Every tenant table: `id uuid pk`, `tenant_id uuid not null references tenant(id)`, `unique (tenant_id, id)`,
+  composite FKs `(tenant_id, x_id) references x (tenant_id, id)`, an index leading with `tenant_id`,
+  `enable row level security` + `force row level security`, explicit policies:
+  select `tenant_id = app_current_tenant()` (+ role narrowing for customer/field_worker),
+  insert/update/delete also `app_has_permission('<perm>')`, and explicit grants to `trackdesk_app`.
+- No delete grant for records that must be kept (customers, jobs, certificates, payments, audit).
+- Add rows for tenant A and B to `src/test/resources/isolation/seed.sql` (RlsIsolationTest fails otherwise).
+- Header comment `-- SECURITY-REVIEW-REQUIRED: <why>`; update docs/03-data-model.md in the same PR.
+- The API role `trackdesk_app` never gets BYPASSRLS or ownership. No SECURITY DEFINER functions without Tech Lead design.
+- Realtime/PostgREST: grant `authenticated` SELECT only on tables deliberately published (Sprint 3), never by default.

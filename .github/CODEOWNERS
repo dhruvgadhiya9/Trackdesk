@@ -1,0 +1,34 @@
+# Two approvals (Tech Lead + second reviewer) for anything that can break tenant isolation,
+# auth, permissions, payments or compliance. Replace the placeholder teams once the org exists.
+# Branch protection must require CODEOWNERS review.
+
+*                                                     @trackdesk/engineering
+
+# Database migrations, bootstrap roles and RLS
+/apps/api/src/main/resources/db/                      @trackdesk/tech-lead @trackdesk/security-reviewers
+/apps/api/scripts/                                    @trackdesk/tech-lead @trackdesk/security-reviewers
+/apps/api/src/test/resources/isolation/               @trackdesk/tech-lead @trackdesk/security-reviewers
+/apps/api/src/test/java/com/trackdesk/isolation/      @trackdesk/tech-lead @trackdesk/security-reviewers
+/supabase/                                            @trackdesk/tech-lead @trackdesk/security-reviewers
+
+# Security, auth, tenancy, permissions
+/apps/api/src/main/java/com/trackdesk/platform/security/  @trackdesk/tech-lead @trackdesk/security-reviewers
+/apps/api/src/main/java/com/trackdesk/platform/tenancy/   @trackdesk/tech-lead @trackdesk/security-reviewers
+/apps/api/src/main/java/com/trackdesk/platform/auth/      @trackdesk/tech-lead @trackdesk/security-reviewers
+/packages/contracts/permissions.yaml                      @trackdesk/tech-lead @trackdesk/product
+/apps/api/src/main/java/com/trackdesk/tenants/            @trackdesk/tech-lead @trackdesk/security-reviewers
+/apps/api/src/main/java/com/trackdesk/users/              @trackdesk/tech-lead @trackdesk/security-reviewers
+
+# Payments and compliance (human sign-off only)
+/apps/api/src/main/java/com/trackdesk/payments/       @trackdesk/tech-lead @trackdesk/founder
+/apps/api/src/main/java/com/trackdesk/compliance/     @trackdesk/tech-lead @trackdesk/compliance
+/apps/api/src/main/java/com/trackdesk/fieldwork/      @trackdesk/tech-lead @trackdesk/compliance
+/apps/mobile/src/location/                            @trackdesk/tech-lead @trackdesk/compliance
+
+# CI, infra, project memory
+/.github/                                             @trackdesk/tech-lead
+/infra/                                               @trackdesk/tech-lead @trackdesk/devops
+/CLAUDE.md                                            @trackdesk/tech-lead
+/.cursor/                                             @trackdesk/tech-lead
+/.claude/                                             @trackdesk/tech-lead
+/packages/ui/src/tokens.ts                            @trackdesk/design

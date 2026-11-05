@@ -1,0 +1,11 @@
+---
+description: Mobile rules (apps/mobile, packages/ui-native)
+globs: apps/mobile/**,packages/ui-native/**
+---
+- UI only from `@trackdesk/ui-native`; styles only from `theme` (tokens). No raw colours or magic numbers.
+- Data via the generated `@trackdesk/contracts` client. Offline writes go through `SyncQueue` with client ids and
+  Idempotency-Key; job status is server-authoritative (409 → needs attention).
+- Location: only via `policy.shouldTrack` (consent + working hours Europe/London + active en_route/on_site job);
+  visible `TrackingIndicator` while tracking; all location code is SECURITY-REVIEW-REQUIRED + DPO sign-off.
+- Sessions in expo-secure-store; never embed service-role keys.
+- Pure logic gets Vitest unit tests; user journeys get Maestro flows in `maestro/`. Device testing is human-only.

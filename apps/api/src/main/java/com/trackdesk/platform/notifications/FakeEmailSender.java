@@ -17,12 +17,28 @@ public class FakeEmailSender implements EmailSender {
   public record SentInvitation(String toEmail, String companyName, String role, String acceptUrl) {}
 
   private final Map<String, SentInvitation> lastByEmail = new ConcurrentHashMap<>();
+  private final boolean logLinks;
+
+  public FakeEmailSender() {
+    this(false);
+  }
+
+  /**
+   * @param logLinks LOCAL PROFILE ONLY: also log the accept link so a developer can accept
+   *     invitations without a mail provider. Never enable in shared environments.
+   */
+  public FakeEmailSender(boolean logLinks) {
+    this.logLinks = logLinks;
+  }
 
   @Override
   public void sendInvitation(String toEmail, String companyName, String role, String acceptUrl) {
     lastByEmail.put(
         toEmail.toLowerCase(), new SentInvitation(toEmail, companyName, role, acceptUrl));
     log.info("[fake-email] invitation for role {} sent to {}", role, toEmail);
+    if (logLinks) {
+      log.warn("[fake-email][local only] accept link for {}: {}", toEmail, acceptUrl);
+    }
   }
 
   public Optional<SentInvitation> lastInvitationTo(String email) {

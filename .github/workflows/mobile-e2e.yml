@@ -1,0 +1,30 @@
+# PLACEHOLDER: Maestro flows on a cloud device farm (Maestro Cloud / BrowserStack / AWS Device
+# Farm — vendor decision pending). Needs an EAS build profile and the vendor API key as a secret.
+name: Mobile E2E (Maestro)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * 1-5'
+
+permissions:
+  contents: read
+
+jobs:
+  maestro:
+    runs-on: ubuntu-latest
+    if: ${{ vars.MOBILE_E2E_ENABLED == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - name: Mobile unit tests (sync queue, tracking policy)
+        run: pnpm --filter @trackdesk/mobile test
+      # TODO(human): build with EAS (eas build --profile e2e) and upload to the device farm, e.g.
+      # - uses: mobile-dev-inc/action-maestro-cloud@v1
+      #   with:
+      #     api-key: ${{ secrets.MAESTRO_CLOUD_API_KEY }}
+      #     app-file: build/app.apk
+      #     workspace: apps/mobile/maestro

@@ -6,7 +6,7 @@ spring:
     virtual:
       enabled: true
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:54322/postgres}
+    url: ${DB_URL:jdbc:postgresql://localhost:54422/postgres}
     # The API role: not superuser, not table owner, no BYPASSRLS (DECISIONS D-006).
     username: ${DB_APP_USER:trackdesk_app}
     password: ${DB_APP_PASSWORD:}

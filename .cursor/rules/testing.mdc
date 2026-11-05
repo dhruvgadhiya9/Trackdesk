@@ -1,0 +1,12 @@
+---
+description: Testing rules
+alwaysApply: true
+---
+- Tests ship with every change. Layers and tools: docs/08-qa-strategy.md.
+- Java: `*UnitTest` (JUnit 5/AssertJ/Mockito) for domain rules; `*ApiIT` extending `IntegrationTest`
+  (Testcontainers PostGIS + Flyway, API as `trackdesk_app`) with one test per Gherkin scenario, named after it.
+- Create test tenants/users through the real onboarding flow (`tenants().newCompany(...)`, `tenants().invite(...)`).
+- Every implemented endpoint needs a `@Covers("<operationId>")` cross-tenant test in `CrossTenantApiTest`
+  (coverage test enforces). New tenant tables are covered automatically by `RlsIsolationTest` (add seed rows).
+- Never weaken isolation tests without Tech Lead sign-off. Never use real data in fixtures.
+- Web: Vitest for components/logic, Playwright for screens (+ axe). Mobile: Vitest for logic, Maestro for flows.

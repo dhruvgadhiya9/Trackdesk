@@ -1,0 +1,14 @@
+---
+description: TrackDesk general rules (mirror of CLAUDE.md — CLAUDE.md is authoritative)
+alwaysApply: true
+---
+- Read CLAUDE.md. It and these rules are the single source of project memory; update both together.
+- Spec before code: PRD + Gherkin in docs/prd/ and the OpenAPI contract in packages/contracts/openapi/ come first.
+- Contract-first: edit OpenAPI, run `pnpm contracts:generate`; never hand-edit anything under `generated/`.
+- Reference module: Customers (api, web screen, tests). Copy its shape.
+- Never put secrets, API keys or real customer data anywhere. Use *.example files and synthetic `example.test` data.
+- No new dependency without a line in docs/02-architecture.md §11.
+- Mark tenant isolation, auth, permissions, payments, location/consent and compliance-certificate code with
+  `SECURITY-REVIEW-REQUIRED` and add it to docs/REVIEW-QUEUE.md (`pnpm review-queue:check`).
+- Never deploy to production, configure production secrets, or mark security/payment/compliance logic approved.
+- Ambiguity: choose the most conservative option and log it in docs/DECISIONS.md.

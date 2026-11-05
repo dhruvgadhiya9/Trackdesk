@@ -1,18 +1,69 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "stream",
-  "globalEnv": ["NODE_ENV", "CI"],
+  "globalEnv": [
+    "NODE_ENV",
+    "CI"
+  ],
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**", "build/libs/**", "storybook-static/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "dist/**",
+        "build/libs/**",
+        "storybook-static/**"
+      ]
     },
-    "lint": { "dependsOn": ["^build"] },
-    "typecheck": { "dependsOn": ["^build"] },
-    "test": { "dependsOn": ["^build"], "outputs": ["coverage/**", "build/reports/**"] },
-    "test:isolation": { "cache": false },
-    "e2e": { "dependsOn": ["^build"], "cache": false },
-    "storybook": { "cache": false, "persistent": true },
-    "dev": { "cache": false, "persistent": true }
+    "lint": {
+      "dependsOn": [
+        "^build"
+      ]
+    },
+    "typecheck": {
+      "dependsOn": [
+        "^build"
+      ]
+    },
+    "test": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": []
+    },
+    "test:isolation": {
+      "cache": false
+    },
+    "e2e": {
+      "dependsOn": [
+        "^build"
+      ],
+      "cache": false
+    },
+    "storybook": {
+      "cache": false,
+      "persistent": true
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "@trackdesk/api#typecheck": {
+      "dependsOn": [
+        "@trackdesk/api#lint"
+      ]
+    },
+    "@trackdesk/api#test": {
+      "dependsOn": [
+        "@trackdesk/api#typecheck"
+      ],
+      "outputs": [
+        "build/reports/**"
+      ]
+    },
+    "@trackdesk/api#lint": {}
   }
 }
