@@ -1,0 +1,47 @@
+# deps / builds
+node_modules/
+.pnpm-store/
+.turbo/
+dist/
+build/
+.next/
+out/
+coverage/
+storybook-static/
+playwright-report/
+test-results/
+*.tsbuildinfo
+.expo/
+ios/
+android/
+
+# java
+apps/api/.gradle/
+apps/api/build/
+apps/api/bin/
+*.class
+
+# env & secrets (never commit)
+.env
+.env.*
+!.env.example
+application-local.yml
+*.pem
+*.key
+supabase/.temp/
+supabase/.branches/
+
+# IDE / OS
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.iml
+.DS_Store
+Thumbs.db
+
+# terraform
+infra/**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
