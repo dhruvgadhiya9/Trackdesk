@@ -1,0 +1,16 @@
+# Maestro flow: field worker logs in and sees Today. Requires a seeded local stack
+# (pnpm db:seed creates field.worker@example.test / Password123! — synthetic).
+appId: app.trackdesk.field
+---
+- launchApp:
+    clearState: true
+- assertVisible: "TrackDesk"
+- tapOn:
+    id: "email"
+- inputText: "field.worker@example.test"
+- tapOn:
+    id: "password"
+- inputText: "Password123!"
+- tapOn:
+    id: "sign-in"
+- assertVisible: "Today"

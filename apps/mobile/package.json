@@ -1,0 +1,40 @@
+{
+  "name": "@trackdesk/mobile",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.ts",
+  "scripts": {
+    "dev": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "e2e": "maestro test maestro/"
+  },
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "2.1.2",
+    "@supabase/supabase-js": "2.75.0",
+    "@trackdesk/contracts": "workspace:*",
+    "@trackdesk/ui": "workspace:*",
+    "@trackdesk/ui-native": "workspace:*",
+    "expo": "53.0.27",
+    "expo-crypto": "~14.1.5",
+    "expo-location": "~18.1.6",
+    "expo-secure-store": "~14.2.4",
+    "expo-sqlite": "~15.2.14",
+    "expo-status-bar": "~2.2.3",
+    "expo-task-manager": "~13.1.6",
+    "react": "19.0.0",
+    "react-native": "0.79.6",
+    "react-native-url-polyfill": "2.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "7.28.4",
+    "@trackdesk/config": "workspace:*",
+    "@types/react": "19.0.14",
+    "eslint": "9.39.5",
+    "typescript": "5.9.3",
+    "vitest": "3.2.4"
+  }
+}

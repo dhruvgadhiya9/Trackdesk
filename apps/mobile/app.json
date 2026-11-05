@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "TrackDesk",
+    "slug": "trackdesk",
+    "scheme": "trackdesk",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "ios": {
+      "bundleIdentifier": "app.trackdesk.field",
+      "supportsTablet": false,
+      "infoPlist": {
+        "UIBackgroundModes": ["location"],
+        "NSLocationWhenInUseUsageDescription": "TrackDesk uses your location while you are on an active job to confirm arrival at the site.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "With your consent, TrackDesk uses your location in the background ONLY during working hours while a job is en route or on site. You can turn this off at any time in Settings > Location."
+      }
+    },
+    "android": {
+      "package": "app.trackdesk.field",
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_LOCATION"
+      ]
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-sqlite",
+      [
+        "expo-location",
+        {
+          "isAndroidBackgroundLocationEnabled": true,
+          "isAndroidForegroundServiceEnabled": true
+        }
+      ]
+    ]
+  }
+}

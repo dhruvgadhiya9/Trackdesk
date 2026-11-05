@@ -1,0 +1,35 @@
+{
+  "name": "@trackdesk/customer",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3001",
+    "build": "next build",
+    "start": "next start -p 3001",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "e2e": "echo \"customer portal e2e arrives in Sprint 5\""
+  },
+  "dependencies": {
+    "@supabase/ssr": "0.7.0",
+    "@supabase/supabase-js": "2.75.0",
+    "@trackdesk/contracts": "workspace:*",
+    "@trackdesk/ui": "workspace:*",
+    "next": "15.5.6",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  },
+  "devDependencies": {
+    "@trackdesk/config": "workspace:*",
+    "@types/node": "22.18.12",
+    "@types/react": "19.1.12",
+    "@types/react-dom": "19.1.9",
+    "autoprefixer": "10.4.21",
+    "eslint": "9.39.5",
+    "postcss": "8.5.6",
+    "tailwindcss": "3.4.18",
+    "typescript": "5.9.3",
+    "vitest": "3.2.4"
+  }
+}
