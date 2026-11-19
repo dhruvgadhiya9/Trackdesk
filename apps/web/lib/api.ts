@@ -5,6 +5,7 @@
  * API client call — screen code depends only on these signatures.
  */
 import * as mock from "./mock";
+import * as ops from "./ops-mock";
 
 const LATENCY_MS = 250;
 
@@ -33,4 +34,17 @@ export const api = {
   notificationTemplates: () => resolve(mock.notificationTemplates),
   sendHistory: () => resolve(mock.sendHistory),
   tickets: () => resolve(mock.tickets),
+  // Operations Manager
+  opsRequests: () => resolve(ops.opsRequests),
+  opsJobs: () => resolve(ops.opsJobs),
+  workOrders: () => resolve(ops.workOrders),
+  capacity: () => resolve(ops.capacity),
+  dispatchSuggestions: () => resolve(ops.dispatchSuggestions),
+  gpsRequests: () => resolve(ops.gpsRequests),
+  warrantyRules: () => resolve(ops.warrantyRules),
+  attendance: () => resolve(ops.attendance),
+  leaveRequests: () => resolve(ops.leaveRequests),
+  opsVehicles: () => resolve(ops.opsVehicles),
+  branchOffers: () => resolve(ops.branchOffers),
+  opsQuotes: () => resolve(ops.opsQuotes),
 };

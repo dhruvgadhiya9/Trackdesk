@@ -9,6 +9,9 @@ const toneByStatus: Record<string, Tone> = {
   Overdue: "danger", Failed: "danger", Rejected: "danger", Emergency: "danger", Escalated: "danger", High: "danger",
   New: "info", Open: "info", Regular: "info", Low: "neutral", Leave: "neutral",
   Assigned: "primary", "In Progress": "violet",
+  Shared: "success", Verified: "success", "Override Approved": "warning", Generated: "info", "Not Generated": "neutral",
+  "Pending Verification": "warning", Present: "success", Late: "warning", Review: "danger", "On Leave": "neutral",
+  Published: "success", Moderate: "warning", Overloaded: "danger", "In Service": "warning", "On Job": "violet",
 };
 
 export function StatusBadge({ status }: { status: string }) {

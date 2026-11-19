@@ -24,3 +24,14 @@ here is approved until a named human signs it off** (reviewer + date in the Stat
 | 16 | Infra | `infra/terraform/` | Draft IaC, never applied by AI | Tech Lead / DevOps | Open |
 | 17 | CI secrets | `.github/workflows/` | `claude-review.yml` uses the `ANTHROPIC_API_KEY` repo secret, set by a human | Tech Lead | Open |
 | 18 | Local bootstrap | `supabase/` | Local roles/passwords (placeholders) and auth settings | Tech Lead | Open |
+
+> Rows 1–18 refer to the pre-`feature/fresh-start` codebase, which is no longer on that branch.
+> Rows below cover the rebuilt frontend (mock data only — enforcement must be server-side).
+
+| # | Area | Path | What to check | Reviewer | Status |
+|---|---|---|---|---|---|
+| 19 | Role permissions UI | `apps/web/app/owner/permissions/page.tsx` | Matrix is display/edit only; server must enforce | Tech Lead + PM | Open |
+| 20 | Location data | `apps/web/components/ops/RequestLocationModal.tsx`, `apps/web/app/ops/gps/page.tsx` | One-off snapshot only, reason required, no continuous tracking (GDPR) | DPO advisor + Tech Lead | Open |
+| 21 | Geo-fenced attendance | `apps/web/app/ops/workforce/page.tsx` | Location shown only as geo-fence result, not coordinates | DPO advisor | Open |
+| 22 | Happy Code override | `apps/web/components/ops/OverrideModal.tsx`, `apps/web/app/ops/happy-code/page.tsx` | Override needs manager permission, reason and audit log server-side | Tech Lead | Open |
+| 23 | Warranty certificates | `apps/web/app/ops/warranty/page.tsx` | Certificate data is a compliance record; must be immutable once issued | Compliance advisor | Open |

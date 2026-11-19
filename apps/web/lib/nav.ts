@@ -21,6 +21,16 @@ import {
   Users,
   Wrench,
   Inbox,
+  Award,
+  BriefcaseBusiness,
+  CalendarDays,
+  Gauge,
+  MapPin,
+  MessagesSquare,
+  Smile,
+  Sparkles,
+  UsersRound,
+  Route,
 } from "lucide-react";
 
 export interface NavItem {
@@ -85,6 +95,46 @@ export const ownerNav: NavGroup[] = [
       { label: "Notification Center", href: "/owner/notifications", icon: Bell },
       { label: "Support Center", href: "/owner/support", icon: LifeBuoy },
       { label: "Settings", href: "/owner/settings", icon: Settings },
+    ],
+  },
+];
+
+/** Operations Manager navigation — mirrors the sidebar on every `om-*` board. */
+export const opsNav: NavGroup[] = [
+  { label: "Overview", items: [{ label: "Dashboard", href: "/ops", icon: LayoutGrid }] },
+  {
+    label: "Requests",
+    items: [
+      { label: "Service Requests", href: "/ops/requests", icon: Inbox, badge: 6 },
+      { label: "Smart Dispatch", href: "/ops/dispatch", icon: Route },
+      { label: "Scheduling", href: "/ops/calendar", icon: CalendarDays },
+      { label: "Capacity Planning", href: "/ops/capacity", icon: Gauge },
+    ],
+  },
+  {
+    label: "Jobs",
+    items: [
+      { label: "Job Pipeline", href: "/ops/pipeline", icon: KanbanSquare },
+      { label: "Work Orders", href: "/ops/workorders", icon: BriefcaseBusiness },
+      { label: "Quotations", href: "/ops/quotes", icon: FileText },
+      { label: "Happy Code", href: "/ops/happy-code", icon: Smile },
+      { label: "Warranty", href: "/ops/warranty", icon: Award },
+    ],
+  },
+  {
+    label: "Team",
+    items: [
+      { label: "Workforce", href: "/ops/workforce", icon: UsersRound },
+      { label: "GPS Requests", href: "/ops/gps", icon: MapPin },
+      { label: "Vehicles", href: "/ops/vehicles", icon: Car },
+      { label: "Communication", href: "/ops/chat", icon: MessagesSquare, badge: 3 },
+    ],
+  },
+  {
+    label: "Growth",
+    items: [
+      { label: "Branch Offers", href: "/ops/offers", icon: Sparkles },
+      { label: "Reports", href: "/ops/reports", icon: BarChart3 },
     ],
   },
 ];

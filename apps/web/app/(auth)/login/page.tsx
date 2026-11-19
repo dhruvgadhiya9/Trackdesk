@@ -5,14 +5,18 @@ import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
 import { useState } from "react";
 import { LogIn } from "lucide-react";
-import { Button, TextField } from "@trackdesk/ui";
+import { Button, SelectField, TextField } from "@trackdesk/ui";
 import { AuthLayout } from "@/components/auth/AuthLayout";
+
+// Demo-only workspace picker until real auth assigns the role from the session.
+const workspaces = { "Company Owner": "/owner", "Operations Manager": "/ops" } as const;
 
 export default function LoginPage() {
   const router = useRouter();
   const [show, setShow] = useState(false);
   const [error, setError] = useState<string>();
   const [busy, setBusy] = useState(false);
+  const [workspace, setWorkspace] = useState<keyof typeof workspaces>("Company Owner");
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -24,7 +28,7 @@ export default function LoginPage() {
     setError(undefined);
     setBusy(true);
     // TODO(auth): replace with real sign-in (Supabase Auth / backend session). Mock only.
-    setTimeout(() => router.push("/owner"), 400);
+    setTimeout(() => router.push(workspaces[workspace]), 400);
   };
 
   return (
@@ -41,6 +45,13 @@ export default function LoginPage() {
           required
           placeholder="Enter your password"
           error={error}
+        />
+        <SelectField
+          label="Workspace (demo)"
+          options={Object.keys(workspaces)}
+          value={workspace}
+          onChange={(e) => setWorkspace(e.target.value as keyof typeof workspaces)}
+          hint="Mock sign-in — any email and password work."
         />
         <div className="flex flex-wrap items-center justify-between gap-3">
           <label className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-ink-2">
