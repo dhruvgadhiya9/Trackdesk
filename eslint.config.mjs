@@ -21,4 +21,6 @@ export default tseslint.config(
       ],
     },
   },
+  // Raw design values are allowed only in the token sources.
+  { files: ["packages/tokens/src/index.ts"], rules: { "no-restricted-syntax": "off" } },
 );
