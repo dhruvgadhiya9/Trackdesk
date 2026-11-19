@@ -1,52 +1,63 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useState, type FormEvent } from 'react';
-import { Button, Card, Input } from '@trackdesk/ui';
-import { supabase } from '@/lib/supabase';
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import type { FormEvent } from "react";
+import { useState } from "react";
+import { LogIn } from "lucide-react";
+import { Button, TextField } from "@trackdesk/ui";
+import { AuthLayout } from "@/components/auth/AuthLayout";
 
 export default function LoginPage() {
   const router = useRouter();
+  const [show, setShow] = useState(false);
   const [error, setError] = useState<string>();
   const [busy, setBusy] = useState(false);
 
-  async function submit(e: FormEvent<HTMLFormElement>) {
+  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const form = new FormData(e.currentTarget);
+    const data = new FormData(e.currentTarget);
+    if (!data.get("email") || !data.get("password")) {
+      setError("Enter your email and password.");
+      return;
+    }
+    setError(undefined);
     setBusy(true);
-    const { error: err } = await supabase().auth.signInWithPassword({
-      email: String(form.get('email')),
-      password: String(form.get('password')),
-    });
-    setBusy(false);
-    if (err) setError(err.message);
-    else router.replace('/');
-  }
+    // TODO(auth): replace with real sign-in (Supabase Auth / backend session). Mock only.
+    setTimeout(() => router.push("/owner"), 400);
+  };
 
   return (
-    <Card>
-      <h1 className="mb-4 text-xl font-semibold">Sign in</h1>
-      <form onSubmit={submit} className="flex flex-col gap-4">
-        <Input name="email" type="email" label="Email" autoComplete="email" required />
-        <Input
-          name="password"
-          type="password"
+    <AuthLayout>
+      <form onSubmit={onSubmit} className="flex flex-col gap-4">
+        <h1 className="m-0 text-3xl font-extrabold tracking-tight text-ink">Welcome back</h1>
+        <p className="m-0 text-base text-muted">Sign in to your company workspace.</p>
+        <TextField label="Email" name="email" type="email" autoComplete="email" required placeholder="you@company.com" />
+        <TextField
           label="Password"
+          name="password"
+          type={show ? "text" : "password"}
           autoComplete="current-password"
           required
+          placeholder="Enter your password"
           error={error}
         />
-        <Button type="submit" loading={busy}>
-          Sign in
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <label className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-ink-2">
+            <input type="checkbox" className="size-4 accent-primary-600" checked={show} onChange={(e) => setShow(e.target.checked)} />
+            Show password
+          </label>
+          <Link href="/forgot-password" className="text-sm font-bold">
+            Forgot password?
+          </Link>
+        </div>
+        <Button type="submit" disabled={busy} className="w-full py-3.5" icon={<LogIn aria-hidden="true" className="size-4" />}>
+          {busy ? "Signing in…" : "Login"}
         </Button>
+        <p className="m-0 text-center text-xs text-muted">
+          By continuing you agree to the <a href="#">Terms &amp; Conditions</a> and <a href="#">Privacy Policy</a>.
+        </p>
       </form>
-      <p className="mt-4 text-sm text-fg-muted">
-        New contractor?{' '}
-        <Link className="text-fg-link" href="/signup">
-          Create your company
-        </Link>
-      </p>
-    </Card>
+    </AuthLayout>
   );
 }

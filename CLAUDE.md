@@ -1,5 +1,7 @@
 # CLAUDE.md — TrackDesk project memory (authoritative)
 
+> **Status 2026-11-20, branch `feature/fresh-start`:** the previous codebase was removed at the user's request and is being rebuilt from the TrackDesk design canvas. Only `packages/ui` and `apps/web` (Company Owner screens, mock data) exist so far; `apps/api`, `packages/contracts`, Supabase, CI and the other apps referenced below are **not yet recreated**. See README.md. Rules below still apply as targets.
+
 TrackDesk is a multi-tenant B2B FSM SaaS, UK-first, for statutory compliance contractors
 (BS 5839 fire alarms, BS 5266 emergency lighting). This file and `.cursor/rules/` are the single
 source of project rules. Update them in the same PR when a convention changes.

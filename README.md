@@ -1,46 +1,30 @@
 # TrackDesk
 
-Multi-tenant field service management for UK statutory compliance contractors (BS 5839 fire
-alarms, BS 5266 emergency lighting). Monorepo: Spring Boot API, Next.js web + customer portal,
-Expo field app, shared OpenAPI contracts and design system.
+Multi-tenant field service management SaaS. UI source of truth: the TrackDesk design canvas
+(6 pages: Cover & Design System, Platform Owner, Company Owner, Operations Manager, Customer Portal, Field Worker).
 
-**Start with [`CLAUDE.md`](CLAUDE.md)** (rules + commands) and [`docs/`](docs/) (scope,
-architecture, data model, PRDs, phase plan). Sprint 0 status: [`docs/GATE-REPORT-sprint0.md`](docs/GATE-REPORT-sprint0.md).
+## Status (branch `feature/fresh-start`)
+| App | Design prefix | Location | State |
+|---|---|---|---|
+| Company Owner web | `co-` (33 boards) | `apps/web` → `/owner`, `/login`, `/forgot-password` | All screens built on **mock data** |
+| Operations Manager web | `om-` | `apps/web` → `/ops` | Not started |
+| Platform Owner web | `po-` | `apps/web` → `/platform` | Not started |
+| Customer portal | `cu-` | `apps/customer` | Not started |
+| Field Worker mobile | `fw-` | `apps/mobile` (Expo) | Not started |
+| Backend API | — | `apps/api` (Java 21 / Spring Boot) | Not started — JDK 21 required |
 
-## Prerequisites
-JDK 21, Node 20+, pnpm 10 (`corepack enable`), Docker. The Supabase CLI is a dev dependency
-(`pnpm exec supabase`). Details: [`docs/12-tooling-setup.md`](docs/12-tooling-setup.md).
-
-## First run
+## Run
 ```bash
 pnpm install
-pnpm contracts:generate                     # OpenAPI -> TS client/Zod, permissions
-pnpm db:start                               # local Supabase on ports 544xx (API 54421, DB 54422)
-cp apps/api/src/main/resources/application-local.yml.example apps/api/src/main/resources/application-local.yml
-#   fill service-role key from `pnpm exec supabase status`
-cp apps/web/.env.example apps/web/.env.local   # fill the anon key
-pnpm db:migrate                             # Flyway as trackdesk_owner
-pnpm --filter @trackdesk/api dev            # API on :8080 (add --args=--server.port=8090 if 8080 is taken)
-pnpm --filter @trackdesk/web dev            # http://localhost:3000
-```
-UI without a backend: `NEXT_PUBLIC_API_MOCKS=1 pnpm --filter @trackdesk/web dev`.
-
-## Checks
-```bash
-pnpm turbo run lint typecheck test          # JS + Java (Java via apps/api/package.json)
-cd apps/api && ./gradlew build              # Spotless, unit, Testcontainers, isolation, Modulith, ArchUnit
-pnpm test:isolation                         # tenant-isolation suite only
-pnpm --filter @trackdesk/web e2e            # Playwright (mock API) + axe
-pnpm contracts:check && pnpm review-queue:check
-API_URL=http://localhost:8080 API_LOG=<path to api log> node scripts/gate-smoke.mjs   # real-stack gate
+pnpm --filter @trackdesk/web dev     # http://localhost:3000 → /login (any email/password works — mock auth)
+pnpm --filter @trackdesk/web build
+pnpm lint && pnpm typecheck
 ```
 
 ## Layout
-```
-apps/api        Spring Boot modular monolith (Java 21, Gradle)     apps/web       Next.js (owner/ops/platform)
-apps/customer   Next.js customer portal                             apps/mobile    Expo field worker app
-packages/contracts  OpenAPI spec, permissions.yaml, generated TS, mocks
-packages/ui     tokens, Tailwind preset, components, Storybook      packages/ui-native  RN components
-packages/config shared eslint/tsconfig/prettier                     infra/terraform     DRAFT IaC (human applies)
-supabase/       local stack config                                  docs/          playbook-derived docs
-```
+- `packages/ui` — design tokens (`src/styles.css`, Tailwind v4 `@theme`) and shared components.
+  Raw colours live **only** in `styles.css` (ESLint blocks hex/rgb elsewhere).
+- `apps/web/lib/mock.ts` — synthetic data transcribed from the design. `lib/api.ts` is the only
+  data access layer: replace its function bodies with real API calls when the backend exists.
+- `apps/web/components/ListScreen.tsx` / `FormLayout.tsx` — list (search, filters, tabs, pagination,
+  loading/empty/error states, delete confirm) and numbered-section form patterns used by most screens.

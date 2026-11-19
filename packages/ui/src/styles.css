@@ -1,9 +1,98 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/*
+ * TrackDesk design tokens — the ONLY place raw design values live.
+ * Source: Figma/Design canvas "design-system" board (Plus Jakarta Sans, indigo primary, navy nav).
+ * Consumed by apps via `@import "@trackdesk/ui/styles.css";` (Tailwind v4 @theme).
+ */
+/* Apps import "tailwindcss" first, then this file. */
+
+@theme {
+  --font-sans: var(--font-jakarta), "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Brand */
+  --color-primary-50: #eef0fe;
+  --color-primary-200: #c7d2fe;
+  --color-primary-300: #a5b4fc;
+  --color-primary-600: #4f46e5;
+  --color-primary-700: #4338ca;
+  --color-primary-800: #3730a3;
+
+  /* Text */
+  --color-ink: #0f172a;
+  --color-ink-2: #334155;
+  --color-ink-3: #475569;
+  --color-muted: #5b6b82;
+  --color-muted-2: #6b7a90;
+  --color-subtle: #94a3b8;
+
+  /* Surfaces & lines */
+  --color-canvas: #f5f7fb;
+  --color-surface: #ffffff;
+  --color-surface-2: #f8fafc;
+  --color-surface-3: #f1f5f9;
+  --color-line: #e3e7f0;
+  --color-line-soft: #eef1f6;
+  --color-line-strong: #cbd3e1;
+
+  /* Navigation */
+  --color-nav: #0b1437;
+  --color-nav-text: #c9d0ea;
+  --color-nav-icon: #9aa6cf;
+  --color-nav-section: #8e9ac4;
+
+  /* Status */
+  --color-success-500: #10b981;
+  --color-success-50: #e3f6ee;
+  --color-success-700: #047857;
+  --color-danger-500: #ef4444;
+  --color-danger-600: #dc2626;
+  --color-danger-50: #fdecec;
+  --color-danger-700: #b91c1c;
+  --color-warning-500: #f59e0b;
+  --color-warning-50: #fef3dc;
+  --color-warning-700: #b45309;
+  --color-info-500: #0ea5e9;
+  --color-info-50: #e3f3fc;
+  --color-violet-600: #7c3aed;
+  --color-violet-50: #f3edfe;
+  --color-pink-500: #ec4899;
+
+  /* Radii */
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  /* Shadows */
+  --shadow-card: 0 4px 14px rgb(15 23 42 / 0.04);
+  --shadow-table: 0 2px 8px rgb(15 23 42 / 0.03);
+  --shadow-primary: 0 4px 12px rgb(79 70 229 / 0.28);
+  --shadow-nav-active: 0 6px 16px rgb(79 70 229 / 0.45);
+  --shadow-modal: 0 24px 64px rgb(15 23 42 / 0.24);
+
+  /* Type scale */
+  --text-2xs: 10px;
+  --text-xs: 11px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-kpi: 26px;
+  --text-title: 28px;
+}
 
 @layer base {
+  html,
   body {
-    @apply bg-bg-canvas font-sans text-fg antialiased;
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  a {
+    color: var(--color-primary-700);
+  }
+  a:hover {
+    color: var(--color-primary-800);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-primary-600);
+    outline-offset: 2px;
   }
 }

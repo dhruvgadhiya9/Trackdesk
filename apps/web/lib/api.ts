@@ -1,20 +1,36 @@
-import { configureApiClient } from '@trackdesk/contracts';
-import { supabase } from './supabase';
-
-export const MOCKS_ENABLED = process.env.NEXT_PUBLIC_API_MOCKS === '1';
-
 /**
- * Wires the generated OpenAPI client. With NEXT_PUBLIC_API_MOCKS=1 requests are answered from the
- * synthetic factories in @trackdesk/contracts/mocks (loaded lazily so they never ship otherwise).
+ * Data access for the Company Owner app.
+ * Today every call resolves synthetic data from ./mock after a short delay so screens exercise
+ * their loading states. When the backend is ready, replace each function body with the generated
+ * API client call — screen code depends only on these signatures.
  */
-export function configureApi(): void {
-  if (typeof window === 'undefined') return;
-  configureApiClient({
-    baseUrl: MOCKS_ENABLED ? '' : (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'),
-    getAccessToken: async () =>
-      MOCKS_ENABLED ? 'mock' : (await supabase().auth.getSession()).data.session?.access_token,
-    fetchImpl: MOCKS_ENABLED
-      ? async (input, init) => (await import('./mockApi')).mockFetch(String(input), init)
-      : undefined,
-  });
+import * as mock from "./mock";
+
+const LATENCY_MS = 250;
+
+function resolve<T>(data: T): Promise<T> {
+  return new Promise((r) => setTimeout(() => r(structuredClone(data)), LATENCY_MS));
 }
+
+export const api = {
+  branches: () => resolve(mock.branches),
+  users: () => resolve(mock.users),
+  customers: () => resolve(mock.customers),
+  customer: (id: string) => resolve(mock.customers.find((c) => c.id === id) ?? null),
+  properties: () => resolve(mock.properties),
+  services: () => resolve(mock.services),
+  offers: () => resolve(mock.offers),
+  taxRules: () => resolve(mock.taxRules),
+  checklists: () => resolve(mock.checklists),
+  requests: () => resolve(mock.requests),
+  jobs: () => resolve(mock.jobs),
+  job: (id: string) => resolve(mock.jobs.find((j) => j.id === id) ?? null),
+  quotes: () => resolve(mock.quotes),
+  invoices: () => resolve(mock.invoices),
+  payments: () => resolve(mock.payments),
+  refunds: () => resolve(mock.refunds),
+  vehicles: () => resolve(mock.vehicles),
+  notificationTemplates: () => resolve(mock.notificationTemplates),
+  sendHistory: () => resolve(mock.sendHistory),
+  tickets: () => resolve(mock.tickets),
+};

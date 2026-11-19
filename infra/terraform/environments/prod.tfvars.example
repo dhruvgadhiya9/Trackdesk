@@ -1,3 +1,0 @@
-environment       = "prod"
-api_image_tag     = "REPLACE_WITH_RELEASE_TAG"
-api_desired_count = 2

@@ -1,4 +1,0 @@
-{
-  "extends": "@trackdesk/config/tsconfig/react-native.json",
-  "include": ["src"]
-}

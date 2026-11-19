@@ -1,5 +1,0 @@
-pnpm-lock.yaml
-**/generated/**
-apps/api/**
-.next
-dist

@@ -1,4 +1,0 @@
-{
-  "extends": "@trackdesk/config/tsconfig/library.json",
-  "include": ["src", "mocks", "test", "orval.config.ts"]
-}
