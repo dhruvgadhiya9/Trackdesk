@@ -11,7 +11,7 @@ const toneByStatus: Record<string, Tone> = {
   Assigned: "primary", "In Progress": "violet",
   Shared: "success", Verified: "success", "Override Approved": "warning", Generated: "info", "Not Generated": "neutral",
   "Pending Verification": "warning", Present: "success", Late: "warning", Review: "danger", "On Leave": "neutral",
-  Published: "success", Moderate: "warning", Overloaded: "danger", "In Service": "warning", "On Job": "violet",
+  Published: "success", Trial: "info", "Renewal Due": "warning", Suspended: "danger", Moderate: "warning", Overloaded: "danger", "In Service": "warning", "On Job": "violet",
 };
 
 export function StatusBadge({ status }: { status: string }) {

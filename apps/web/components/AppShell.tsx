@@ -7,12 +7,12 @@ import { useState } from "react";
 import clsx from "clsx";
 import { Bell, ChevronDown, CircleHelp, GitBranch, Menu, MessageSquare, Share2, X } from "lucide-react";
 import { Avatar, FilterSelect, IconButton, SearchInput } from "@trackdesk/ui";
-import { opsNav, ownerNav, type NavGroup } from "@/lib/nav";
+import { opsNav, ownerNav, platformNav, type NavGroup } from "@/lib/nav";
 
 // Nav groups hold icon components, which cannot cross the server→client boundary as props,
 // so layouts pass an app key and the nav is resolved here.
-const navs: Record<AppKey, NavGroup[]> = { owner: ownerNav, ops: opsNav };
-export type AppKey = "owner" | "ops";
+const navs: Record<AppKey, NavGroup[]> = { owner: ownerNav, ops: opsNav, platform: platformNav };
+export type AppKey = "owner" | "ops" | "platform";
 
 export interface ShellUser {
   name: string;

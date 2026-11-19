@@ -35,3 +35,7 @@ here is approved until a named human signs it off** (reviewer + date in the Stat
 | 21 | Geo-fenced attendance | `apps/web/app/ops/workforce/page.tsx` | Location shown only as geo-fence result, not coordinates | DPO advisor | Open |
 | 22 | Happy Code override | `apps/web/components/ops/OverrideModal.tsx`, `apps/web/app/ops/happy-code/page.tsx` | Override needs manager permission, reason and audit log server-side | Tech Lead | Open |
 | 23 | Warranty certificates | `apps/web/app/ops/warranty/page.tsx` | Certificate data is a compliance record; must be immutable once issued | Compliance advisor | Open |
+| 24 | Tenant suspension | `apps/web/components/platform/SuspendModal.tsx`, `apps/web/app/platform/companies/` | Suspend/reactivate must be super-admin only, audit-logged, revoke sessions server-side | Tech Lead | Open |
+| 25 | Tenant provisioning | `apps/web/app/platform/companies/new/page.tsx` | Tenant creation + admin invite (no plaintext credentials by email; use invite links) | Tech Lead + 2nd | Open |
+| 26 | GDPR requests | `apps/web/app/platform/gdpr/page.tsx` | Export/erasure approvals, consent records; erasure irreversible | DPO advisor + Tech Lead | Open |
+| 27 | Session security | `apps/web/app/platform/security/page.tsx` | Cross-tenant session/IP visibility and forced sign-out | Tech Lead | Open |

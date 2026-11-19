@@ -9,7 +9,7 @@ import { Button, SelectField, TextField } from "@trackdesk/ui";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 
 // Demo-only workspace picker until real auth assigns the role from the session.
-const workspaces = { "Company Owner": "/owner", "Operations Manager": "/ops" } as const;
+const workspaces = { "Company Owner": "/owner", "Operations Manager": "/ops", "Platform Owner": "/platform" } as const;
 
 export default function LoginPage() {
   const router = useRouter();

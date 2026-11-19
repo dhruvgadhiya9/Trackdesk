@@ -31,6 +31,12 @@ import {
   Sparkles,
   UsersRound,
   Route,
+  Building,
+  CreditCard as PlanIcon,
+  Headset,
+  Activity,
+  ShieldCheck,
+  Lock,
 } from "lucide-react";
 
 export interface NavItem {
@@ -135,6 +141,34 @@ export const opsNav: NavGroup[] = [
     items: [
       { label: "Branch Offers", href: "/ops/offers", icon: Sparkles },
       { label: "Reports", href: "/ops/reports", icon: BarChart3 },
+    ],
+  },
+];
+
+/** Platform Owner navigation — mirrors the sidebar on every `po-*` board. */
+export const platformNav: NavGroup[] = [
+  { label: "Overview", items: [{ label: "Dashboard", href: "/platform", icon: LayoutGrid }] },
+  {
+    label: "Tenants",
+    items: [
+      { label: "Companies", href: "/platform/companies", icon: Building },
+      { label: "Subscription Plans", href: "/platform/plans", icon: PlanIcon },
+    ],
+  },
+  {
+    label: "Support",
+    items: [
+      { label: "Support Tickets", href: "/platform/tickets", icon: LifeBuoy, badge: 12 },
+      { label: "Support Agents", href: "/platform/agents", icon: Headset },
+    ],
+  },
+  {
+    label: "Platform",
+    items: [
+      { label: "Platform Monitoring", href: "/platform/monitoring", icon: Activity },
+      { label: "GDPR & Compliance", href: "/platform/gdpr", icon: ShieldCheck },
+      { label: "Reports", href: "/platform/reports", icon: BarChart3 },
+      { label: "Security", href: "/platform/security", icon: Lock },
     ],
   },
 ];

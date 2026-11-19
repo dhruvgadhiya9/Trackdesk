@@ -8,7 +8,7 @@ Multi-tenant field service management SaaS. UI source of truth: the TrackDesk de
 |---|---|---|---|
 | Company Owner web | `co-` (33 boards) | `apps/web` → `/owner`, `/login`, `/forgot-password` | All screens built on **mock data** |
 | Operations Manager web | `om-` (22 boards) | `apps/web` → `/ops` | All screens built on **mock data** |
-| Platform Owner web | `po-` | `apps/web` → `/platform` | Not started |
+| Platform Owner web | `po-` (14 boards) | `apps/web` → `/platform` | All screens built on **mock data** |
 | Customer portal | `cu-` | `apps/customer` | Not started |
 | Field Worker mobile | `fw-` | `apps/mobile` (Expo) | Not started |
 | Backend API | — | `apps/api` (Java 21 / Spring Boot) | Not started — JDK 21 required |

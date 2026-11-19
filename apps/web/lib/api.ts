@@ -6,6 +6,7 @@
  */
 import * as mock from "./mock";
 import * as ops from "./ops-mock";
+import * as platform from "./platform-mock";
 
 const LATENCY_MS = 250;
 
@@ -47,4 +48,12 @@ export const api = {
   opsVehicles: () => resolve(ops.opsVehicles),
   branchOffers: () => resolve(ops.branchOffers),
   opsQuotes: () => resolve(ops.opsQuotes),
+  // Platform Owner
+  companies: () => resolve(platform.companies),
+  plans: () => resolve(platform.plans),
+  platformTickets: () => resolve(platform.platformTickets),
+  agents: () => resolve(platform.agents),
+  gdprExports: () => resolve(platform.gdprExports),
+  gdprDeletions: () => resolve(platform.gdprDeletions),
+  auditLog: () => resolve(platform.auditLog),
 };
