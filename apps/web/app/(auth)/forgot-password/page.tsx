@@ -5,7 +5,7 @@ import type { FormEvent } from "react";
 import { useState } from "react";
 import { ChevronLeft, KeyRound, MailCheck, Send } from "lucide-react";
 import { Button, TextField } from "@trackdesk/ui";
-import { AuthLayout } from "@/components/auth/AuthLayout";
+import { AuthLayout } from "@trackdesk/ui";
 
 export default function ForgotPasswordPage() {
   const [sent, setSent] = useState(false);

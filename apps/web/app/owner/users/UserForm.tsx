@@ -23,6 +23,7 @@ export function UserForm({ user }: { user?: User }) {
   const title = user ? `Edit ${user.name}` : "Add User";
 
   return (
+    <>
     <FormLayout
       crumbs={["Home", "Users", title]}
       title={title}
@@ -71,6 +72,7 @@ export function UserForm({ user }: { user?: User }) {
       <FormSection step={user ? 4 : 5} title="Status" columns={1}>
         <ChoiceGroup label="Status" options={["Active", "Inactive"] as const} value={status} onChange={setStatus} />
       </FormSection>
+    </FormLayout>
       <Modal
         open={resetOpen}
         title="Reset password"
@@ -90,6 +92,6 @@ export function UserForm({ user }: { user?: User }) {
           <TextField label="Confirm Password" type="password" autoComplete="new-password" required hint="At least 8 characters with a number and a symbol." />
         </div>
       </Modal>
-    </FormLayout>
+    </>
   );
 }

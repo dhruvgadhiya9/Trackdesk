@@ -39,3 +39,6 @@ here is approved until a named human signs it off** (reviewer + date in the Stat
 | 25 | Tenant provisioning | `apps/web/app/platform/companies/new/page.tsx` | Tenant creation + admin invite (no plaintext credentials by email; use invite links) | Tech Lead + 2nd | Open |
 | 26 | GDPR requests | `apps/web/app/platform/gdpr/page.tsx` | Export/erasure approvals, consent records; erasure irreversible | DPO advisor + Tech Lead | Open |
 | 27 | Session security | `apps/web/app/platform/security/page.tsx` | Cross-tenant session/IP visibility and forced sign-out | Tech Lead | Open |
+| 28 | Customer payments | `apps/customer/app/(portal)/billing/pay/[id]/PayInvoice.tsx` | Must use Stripe Elements/Checkout (SAQ-A); intents created server-side; **payment sign-off is human-only** | Tech Lead + payments owner | Open |
+| 29 | Customer Happy Code | `apps/customer/app/(portal)/requests/[id]/happy-code/HappyCode.tsx` | OTP generation/hashing/expiry server-side; customer sees only own code | Tech Lead | Open |
+| 30 | Customer consent | `apps/customer/app/(portal)/profile/page.tsx` | Marketing vs service consent persisted with timestamp + policy version | DPO advisor | Open |

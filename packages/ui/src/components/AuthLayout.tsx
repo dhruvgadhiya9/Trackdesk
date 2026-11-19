@@ -8,7 +8,7 @@ const stats = [
 ];
 
 /** Split-screen auth layout from the `co-login` / `co-forgot` boards. */
-export function AuthLayout({ children }: { children: ReactNode }) {
+export function AuthLayout({ children, footer = "© 2026 TrackDesk · GDPR compliant" }: { children: ReactNode; footer?: string }) {
   return (
     <div className="flex min-h-screen flex-wrap">
       <section className="relative flex flex-[1_1_480px] flex-col justify-between gap-10 overflow-hidden bg-nav px-8 py-12 sm:px-16 sm:py-14">
@@ -37,7 +37,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
             ))}
           </div>
         </div>
-        <p className="relative m-0 text-sm font-medium text-nav-section">© 2026 TrackDesk · GDPR compliant</p>
+        <p className="relative m-0 text-sm font-medium text-nav-section">{footer}</p>
       </section>
       <section className="flex flex-[1_1_420px] items-center justify-center bg-surface px-8 py-12">
         <div className="flex w-full max-w-[420px] flex-col gap-5">{children}</div>

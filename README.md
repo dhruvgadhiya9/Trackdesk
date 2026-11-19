@@ -9,7 +9,7 @@ Multi-tenant field service management SaaS. UI source of truth: the TrackDesk de
 | Company Owner web | `co-` (33 boards) | `apps/web` → `/owner`, `/login`, `/forgot-password` | All screens built on **mock data** |
 | Operations Manager web | `om-` (22 boards) | `apps/web` → `/ops` | All screens built on **mock data** |
 | Platform Owner web | `po-` (14 boards) | `apps/web` → `/platform` | All screens built on **mock data** |
-| Customer portal | `cu-` | `apps/customer` | Not started |
+| Customer portal | `cu-` (23 boards) | `apps/customer` (port 3001) | All screens built on **mock data** |
 | Field Worker mobile | `fw-` | `apps/mobile` (Expo) | Not started |
 | Backend API | — | `apps/api` (Java 21 / Spring Boot) | Not started — JDK 21 required |
 
@@ -18,11 +18,12 @@ Multi-tenant field service management SaaS. UI source of truth: the TrackDesk de
 pnpm install
 pnpm --filter @trackdesk/web dev     # http://localhost:3000 → /login (pick the workspace on the login page; any email/password works — mock auth)
 pnpm --filter @trackdesk/web build
+pnpm --filter @trackdesk/customer dev  # customer portal on http://localhost:3001 (mock auth)
 pnpm lint && pnpm typecheck
 ```
 
 ## Layout
-- `packages/ui` — design tokens (`src/styles.css`, Tailwind v4 `@theme`) and shared components.
+- `packages/ui` — design tokens (`src/styles.css`, Tailwind v4 `@theme`) and shared components (incl. StatusBadge, FormSection, AuthLayout, useQuery) used by both web apps.
   Raw colours live **only** in `styles.css` (ESLint blocks hex/rgb elsewhere).
 - `apps/web/lib/mock.ts` — synthetic data transcribed from the design. `lib/api.ts` is the only
   data access layer: replace its function bodies with real API calls when the backend exists.

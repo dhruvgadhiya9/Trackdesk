@@ -6,7 +6,7 @@ import type { FormEvent } from "react";
 import { useState } from "react";
 import { LogIn } from "lucide-react";
 import { Button, SelectField, TextField } from "@trackdesk/ui";
-import { AuthLayout } from "@/components/auth/AuthLayout";
+import { AuthLayout } from "@trackdesk/ui";
 
 // Demo-only workspace picker until real auth assigns the role from the session.
 const workspaces = { "Company Owner": "/owner", "Operations Manager": "/ops", "Platform Owner": "/platform" } as const;
